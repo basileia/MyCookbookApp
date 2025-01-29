@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MyCookbook.Data;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MyCookbook.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250127203452_AddedRecipeAndRecipeIngredient")]
+    partial class AddedRecipeAndRecipeIngredient
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,21 +24,6 @@ namespace MyCookbook.Data.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
-
-            modelBuilder.Entity("CategoryRecipe", b =>
-                {
-                    b.Property<int>("CategoriesId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("RecipesId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("CategoriesId", "RecipesId");
-
-                    b.HasIndex("RecipesId");
-
-                    b.ToTable("CategoryRecipe");
-                });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
@@ -245,7 +233,12 @@ namespace MyCookbook.Data.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<int?>("RecipeId")
+                        .HasColumnType("integer");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("RecipeId");
 
                     b.ToTable("Categories");
 
@@ -344,21 +337,6 @@ namespace MyCookbook.Data.Migrations
                     b.ToTable("RecipeIngredients");
                 });
 
-            modelBuilder.Entity("CategoryRecipe", b =>
-                {
-                    b.HasOne("MyCookbook.Data.Models.Category", null)
-                        .WithMany()
-                        .HasForeignKey("CategoriesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("MyCookbook.Data.Models.Recipe", null)
-                        .WithMany()
-                        .HasForeignKey("RecipesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -410,6 +388,13 @@ namespace MyCookbook.Data.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("MyCookbook.Data.Models.Category", b =>
+                {
+                    b.HasOne("MyCookbook.Data.Models.Recipe", null)
+                        .WithMany("Categories")
+                        .HasForeignKey("RecipeId");
+                });
+
             modelBuilder.Entity("MyCookbook.Data.Models.Recipe", b =>
                 {
                     b.HasOne("MyCookbook.Data.ApplicationUser", "User")
@@ -430,7 +415,7 @@ namespace MyCookbook.Data.Migrations
                         .IsRequired();
 
                     b.HasOne("MyCookbook.Data.Models.Recipe", "Recipe")
-                        .WithMany("Ingredients")
+                        .WithMany("IngredientsList")
                         .HasForeignKey("RecipeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -442,7 +427,9 @@ namespace MyCookbook.Data.Migrations
 
             modelBuilder.Entity("MyCookbook.Data.Models.Recipe", b =>
                 {
-                    b.Navigation("Ingredients");
+                    b.Navigation("Categories");
+
+                    b.Navigation("IngredientsList");
                 });
 #pragma warning restore 612, 618
         }

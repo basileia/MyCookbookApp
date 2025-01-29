@@ -11,10 +11,10 @@ namespace MyCookbook.Data.Models
         public int NumberOfServings { get; set; }
         [Required(ErrorMessage = "Postup přípravy je povinný údaj.")]
         public string Preparation { get; set; }
-        public List<Ingredient> IngredientsList { get; set; } = new List<Ingredient>();
+        public List<RecipeIngredient> Ingredients { get; set; } = new List<RecipeIngredient>();
         public List<Category> Categories { get; set; } = new List<Category>();
         public DateTime DateAdded { get; set; } = DateTime.Now;
-        public int UserId { get; set; } //user who added the recipe
+        public string UserId { get; set; } //user who added the recipe
         public ApplicationUser User { get; set; }  // navigation for user (Identity)
     }
 }
