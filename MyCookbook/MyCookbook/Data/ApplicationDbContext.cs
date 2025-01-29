@@ -10,6 +10,7 @@ namespace MyCookbook.Data
         public DbSet<Category> Categories { get; set; }
         public DbSet<Recipe> Recipes { get; set; }
         public DbSet<RecipeIngredient> RecipeIngredients { get; set; }
+        public DbSet<UserRecipeStatus> UserRecipeStatuses { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -23,9 +24,9 @@ namespace MyCookbook.Data
             );
 
             modelBuilder.Entity<Recipe>()
-                .HasOne(r => r.User) // navigation
+                .HasOne(r => r.User) 
                 .WithMany()  
-                .HasForeignKey(r => r.UserId) // foreign key
+                .HasForeignKey(r => r.UserId) 
                 .OnDelete(DeleteBehavior.Restrict);  
 
             modelBuilder.Entity<RecipeIngredient>()
@@ -40,6 +41,21 @@ namespace MyCookbook.Data
                 .HasOne(ri => ri.Ingredient)
                 .WithMany()
                 .HasForeignKey(ri => ri.IngredientId);
+
+            modelBuilder.Entity<UserRecipeStatus>()
+                .HasKey(urs => new { urs.UserId, urs.RecipeId });
+
+            modelBuilder.Entity<UserRecipeStatus>()
+                .HasOne(urs => urs.User)
+                .WithMany()
+                .HasForeignKey(urs => urs.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<UserRecipeStatus>()
+                .HasOne(urs => urs.Recipe)
+                .WithMany()
+                .HasForeignKey(urs => urs.RecipeId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }
