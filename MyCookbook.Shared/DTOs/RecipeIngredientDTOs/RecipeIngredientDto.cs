@@ -1,4 +1,4 @@
-﻿namespace MyCookbook.Shared.DTOs
+﻿namespace MyCookbook.Shared.DTOs.RecipeIngredientDTOs
 {
     public class RecipeIngredientDto
     {

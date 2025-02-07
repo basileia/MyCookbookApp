@@ -1,6 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using MyCookbook.Shared.DTOs.RecipeIngredientDTOs;
+using System.ComponentModel.DataAnnotations;
 
-namespace MyCookbook.Shared.DTOs
+namespace MyCookbook.Shared.DTOs.RecipeDTOs
 {
     public class CreateRecipeDto
     {
@@ -13,7 +14,7 @@ namespace MyCookbook.Shared.DTOs
         [Required]
         public string Preparation { get; set; }
 
-        public List<int> CategoryIds { get; set; } 
+        public List<int> CategoryIds { get; set; }
         public List<CreateRecipeIngredientDto> Ingredients { get; set; }
     }
 }

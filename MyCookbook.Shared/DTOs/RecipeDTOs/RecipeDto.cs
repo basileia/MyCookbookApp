@@ -1,4 +1,6 @@
-﻿namespace MyCookbook.Shared.DTOs
+﻿using MyCookbook.Shared.DTOs.RecipeIngredientDTOs;
+
+namespace MyCookbook.Shared.DTOs.RecipeDTOs
 {
     public class RecipeDto
     {

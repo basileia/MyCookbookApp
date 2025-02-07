@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace MyCookbook.Shared.DTOs
+namespace MyCookbook.Shared.DTOs.IngredientDTOs
 {
     public class CreateIngredientDto
     {
