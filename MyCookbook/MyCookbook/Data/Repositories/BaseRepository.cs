@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using MyCookbook.Data.Contracts;
+using MyCookbook.Data.Contracts.Repositories;
 
 namespace MyCookbook.Data.Repositories
 {

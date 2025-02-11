@@ -6,8 +6,10 @@ using MyCookbook.Client.Pages;
 using MyCookbook.Components;
 using MyCookbook.Components.Account;
 using MyCookbook.Data;
-using MyCookbook.Data.Contracts;
+using MyCookbook.Data.Contracts.Repositories;
+using MyCookbook.Data.Contracts.Services;
 using MyCookbook.Data.Repositories;
+using MyCookbook.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,6 +25,7 @@ builder.Services.AddScoped<IdentityRedirectManager>();
 builder.Services.AddScoped<AuthenticationStateProvider, PersistingServerAuthenticationStateProvider>();
 
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IMapper, Mapper>();
 
 builder.Services.AddAuthorization();
