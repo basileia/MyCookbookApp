@@ -1,3 +1,4 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -5,6 +6,8 @@ using MyCookbook.Client.Pages;
 using MyCookbook.Components;
 using MyCookbook.Components.Account;
 using MyCookbook.Data;
+using MyCookbook.Data.Contracts;
+using MyCookbook.Data.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +21,9 @@ builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddScoped<IdentityUserAccessor>();
 builder.Services.AddScoped<IdentityRedirectManager>();
 builder.Services.AddScoped<AuthenticationStateProvider, PersistingServerAuthenticationStateProvider>();
+
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<IMapper, Mapper>();
 
 builder.Services.AddAuthorization();
 builder.Services.AddAuthentication(options =>
