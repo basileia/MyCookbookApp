@@ -21,6 +21,5 @@ namespace MyCookbook.Services
             var categories = await _categoryRepository.GetAllAsync();
             return _mapper.Map<List<CategoryDto>>(categories);
         }
-
     }
 }
