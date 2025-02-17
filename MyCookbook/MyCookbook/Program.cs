@@ -14,9 +14,12 @@ using MyCookbook.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+
+builder.Services.AddHttpClient();
 builder.Services.AddRazorComponents()
     .AddInteractiveWebAssemblyComponents();
 
+builder.Services.AddControllers();
 builder.Services.AddAutoMapper(typeof(Program));
 
 builder.Services.AddCascadingAuthenticationState();
@@ -24,7 +27,6 @@ builder.Services.AddScoped<IdentityUserAccessor>();
 builder.Services.AddScoped<IdentityRedirectManager>();
 builder.Services.AddScoped<AuthenticationStateProvider, PersistingServerAuthenticationStateProvider>();
 
-builder.Services.AddHttpClient();
 builder.Services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
@@ -52,6 +54,10 @@ builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSe
 
 var app = builder.Build();
 
+app.UseRouting();
+app.UseAuthorization();
+
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -65,8 +71,6 @@ else
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
-
 app.UseStaticFiles();
 app.UseAntiforgery();
 
@@ -76,5 +80,7 @@ app.MapRazorComponents<App>()
 
 // Add additional endpoints required by the Identity /Account Razor components.
 app.MapAdditionalIdentityEndpoints();
+
+app.MapControllers();
 
 app.Run();

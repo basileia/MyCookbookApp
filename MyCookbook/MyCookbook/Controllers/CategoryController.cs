@@ -4,7 +4,7 @@ using MyCookbook.Shared.DTOs;
 
 namespace MyCookbook.Controllers
 {
-    [Route("api/categories")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     public class CategoryController : ControllerBase
     {
