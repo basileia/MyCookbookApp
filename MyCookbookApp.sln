@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyCookbook", "MyCookbook\My
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyCookbook.Client", "MyCookbook\MyCookbook.Client\MyCookbook.Client.csproj", "{1C64A817-4317-4121-ACF8-1568B01BB77D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyCookbook.Shared", "MyCookbook.Shared\MyCookbook.Shared.csproj", "{5658DA2D-F8E8-4434-8305-5FC87EDA692E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyCookbook.Shared", "MyCookbook\MyCookbook.Shared\MyCookbook.Shared.csproj", "{746062CC-3713-452C-8682-30340195604E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +23,10 @@ Global
 		{1C64A817-4317-4121-ACF8-1568B01BB77D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1C64A817-4317-4121-ACF8-1568B01BB77D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1C64A817-4317-4121-ACF8-1568B01BB77D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5658DA2D-F8E8-4434-8305-5FC87EDA692E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5658DA2D-F8E8-4434-8305-5FC87EDA692E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5658DA2D-F8E8-4434-8305-5FC87EDA692E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5658DA2D-F8E8-4434-8305-5FC87EDA692E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{746062CC-3713-452C-8682-30340195604E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{746062CC-3713-452C-8682-30340195604E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{746062CC-3713-452C-8682-30340195604E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{746062CC-3713-452C-8682-30340195604E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

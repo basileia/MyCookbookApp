@@ -15,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\MyCookbook.Shared\MyCookbook.Shared.csproj" />
+    <ProjectReference Include="..\MyCookbook.Shared\MyCookbook.Shared.csproj" />
   </ItemGroup>
 
 </Project>

@@ -8,8 +8,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\MyCookbook.Shared\MyCookbook.Shared.csproj" />
     <ProjectReference Include="..\MyCookbook.Client\MyCookbook.Client.csproj" />
+    <ProjectReference Include="..\MyCookbook.Shared\MyCookbook.Shared.csproj" />
     <PackageReference Include="AutoMapper" Version="13.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.0.11" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.0.11" />
