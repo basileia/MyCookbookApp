@@ -2,7 +2,7 @@
 
 namespace MyCookbook.Shared.DTOs.RecipeDTOs
 {
-    public class RecipeDto
+    public class RecipeDetailDto
     {
         public int Id { get; set; }
         public string Name { get; set; }
