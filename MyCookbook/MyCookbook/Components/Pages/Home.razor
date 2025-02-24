@@ -1,7 +1,45 @@
 ﻿@page "/"
+@using MyCookbook.Shared.DTOs.RecipeDTOs
+@inject HttpClient Http
 
 <PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
+<h2>📖 Všechny recepty</h2>
 
-Welcome to your new app.
+@if (recipes == null)
+{
+    <p>Načítám recepty...</p>
+}
+else
+{
+    <div class="recipe-grid">
+        @foreach (var recipe in recipes)
+        {
+            <div class="recipe-card">
+                @* @onclick="() => NavigateToDetail(recipe.Id) *@
+                @if (recipe.Icons != null)
+                {
+                    @foreach (var icon in recipe.Icons)
+                    {
+                        <i class="@icon"></i>
+                    }
+                }
+                <h3>@recipe.Name</h3>
+            </div>
+        }
+    </div>
+}
+
+@code {
+    private List<RecipeListDto>? recipes;
+
+    protected override async Task OnInitializedAsync()
+    {
+        recipes = await Http.GetFromJsonAsync<List<RecipeListDto>>("http://localhost:5236/api/recipe/getrecipes");
+    }
+
+    // private void NavigateToDetail(int id)
+    // {
+    //     Navigation.NavigateTo($"/recept/{id}");
+    // }
+}
