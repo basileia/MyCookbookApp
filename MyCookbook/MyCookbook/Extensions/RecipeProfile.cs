@@ -1,22 +1,17 @@
-﻿//using AutoMapper;
-//using MyCookbook.Data.Models;
-//using MyCookbook.Shared.DTOs;
-//using MyCookbook.Shared.DTOs.RecipeDTOs;
-//using MyCookbook.Shared.DTOs.RecipeIngredientDTOs;
+﻿using AutoMapper;
+using MyCookbook.Data.Models;
+using MyCookbook.Shared.DTOs.RecipeDTOs;
 
-//namespace MyCookbook.Extensions
-//{
-//    public class RecipeProfile : Profile
-//    {
-//        public RecipeProfile()
-//        {
-//            CreateMap<Recipe, RecipeDto>()
-//            .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.User.UserName)) 
-//            .ForMember(dest => dest.Categories, opt => opt.MapFrom(src => src.Categories)) 
-//            .ForMember(dest => dest.Ingredients, opt => opt.MapFrom(src => src.Ingredients));
-
-//            CreateMap<RecipeIngredient, RecipeIngredientDto>(); 
-//            CreateMap<Category, CategoryDto>(); 
-//        }
-//    }
-//}
+namespace MyCookbook.Extensions
+{
+    public class RecipeProfile : Profile
+    {
+        public RecipeProfile()
+        {
+            CreateMap<Recipe, RecipeDetailDto>()
+            .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.User.UserName));
+            
+            CreateMap<Recipe, RecipeListDto>();            
+        }
+    }
+}
