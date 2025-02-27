@@ -1,6 +1,8 @@
 ﻿@page "/"
 @using MyCookbook.Shared.DTOs.RecipeDTOs
+
 @inject HttpClient Http
+@inject NavigationManager Navigation
 
 <PageTitle>Home</PageTitle>
 
@@ -12,11 +14,10 @@
 }
 else
 {
-    <div class="recipe-grid">
+    <div class="recipe-grid" >       
         @foreach (var recipe in recipes)
         {
-            <div class="recipe-card">
-                @* @onclick="() => NavigateToDetail(recipe.Id) *@
+            <NavLink class="recipe-card" href="@($"/recipe/{recipe.Id}")">
                 @if (recipe.Icons != null)
                 {
                     @foreach (var icon in recipe.Icons)
@@ -25,7 +26,7 @@ else
                     }
                 }
                 <h3>@recipe.Name</h3>
-            </div>
+            </NavLink>           
         }
     </div>
 }
@@ -35,11 +36,10 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        recipes = await Http.GetFromJsonAsync<List<RecipeListDto>>("http://localhost:5236/api/recipe/getrecipes");
+        recipes = await Http.GetFromJsonAsync<List<RecipeListDto>>("/api/recipe/getrecipes");
+        if (recipes == null)
+        {
+            Console.WriteLine("Chyba: Recepty jsou null");
+        }
     }
-
-    // private void NavigateToDetail(int id)
-    // {
-    //     Navigation.NavigateTo($"/recept/{id}");
-    // }
 }

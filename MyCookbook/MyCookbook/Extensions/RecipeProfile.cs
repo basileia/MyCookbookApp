@@ -9,8 +9,9 @@ namespace MyCookbook.Extensions
         public RecipeProfile()
         {
             CreateMap<Recipe, RecipeDetailDto>()
-            .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.User.UserName));
-            
+            .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.User.UserName))
+            .ForMember(dest => dest.Ingredients, opt => opt.MapFrom(src => src.Ingredients));
+
             CreateMap<Recipe, RecipeListDto>();            
         }
     }

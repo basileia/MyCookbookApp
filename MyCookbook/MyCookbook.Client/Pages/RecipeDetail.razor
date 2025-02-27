@@ -1,0 +1,47 @@
+﻿@page "/recipe/{id:int}"
+@using MyCookbook.Shared.DTOs.RecipeDTOs
+@inject HttpClient Http
+
+<h2>@recipe?.Name</h2>
+
+@if (recipe == null)
+{
+    <p>Načítám...</p>
+}
+else
+{
+    <div>
+        <p><strong>Počet porcí:</strong> @recipe.NumberOfServings</p>
+        <div class="recipe-container">
+            <div class="recipe-ingredients">
+                <p><strong>Suroviny:</strong></p>
+                @if (recipe.Ingredients == null || !recipe.Ingredients.Any())
+                {
+                    <p>Žádné suroviny</p>
+                }
+                else
+                {
+                    <ul>
+                        @foreach (var ingredient in recipe.Ingredients)
+                        {
+                            <li>@ingredient.IngredientName</li>
+                        }
+                    </ul>
+                }
+            </div>
+            <div class="recipe-preparation">
+                <p><strong>Postup:</strong> @recipe.Preparation</p>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public int Id { get; set; }
+    private RecipeDetailDto? recipe;
+
+    protected override async Task OnInitializedAsync()
+    {
+        recipe = await Http.GetFromJsonAsync<RecipeDetailDto>($"/api/recipe/getrecipe/{Id}");        
+    }
+}

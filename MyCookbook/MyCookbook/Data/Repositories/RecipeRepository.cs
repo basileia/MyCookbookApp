@@ -22,6 +22,7 @@ namespace MyCookbook.Data.Repositories
             return await _context.Recipes
                 .Include(r => r.Categories)
                 .Include(r => r.Ingredients)
+                    .ThenInclude(ri => ri.Ingredient)
                 .FirstOrDefaultAsync(r => r.Id == id);
         }
     }

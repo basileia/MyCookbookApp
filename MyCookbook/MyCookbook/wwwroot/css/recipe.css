@@ -1,0 +1,15 @@
+﻿.recipe-container {
+    display: flex;
+    justify-content: space-between;
+}
+
+.recipe-ingredients {
+    flex: 1 1 30%;
+    margin-right: 20px;
+    min-width: 200px;
+}
+
+.recipe-preparation {
+    flex: 2 1 70%;
+    min-width: 300px;
+}
