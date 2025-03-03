@@ -6,15 +6,16 @@ namespace MyCookbook.Shared.DTOs.RecipeDTOs
     public class CreateRecipeDto
     {
         [Required]
-        public string Name { get; set; }
+        [StringLength(100, MinimumLength = 3, ErrorMessage = "Název musí mít 3-100 znaků")]
+        public string Name { get; set; } = string.Empty;
 
-        [Range(1, int.MaxValue)]
+        [Range(1, int.MaxValue, ErrorMessage = "Počet porcí musí být alespoň 1")]
         public int NumberOfServings { get; set; }
 
         [Required]
-        public string Preparation { get; set; }
+        public List<RecipeStepDto> Steps { get; set; } = new();
 
-        public List<int> CategoryIds { get; set; }
-        public List<CreateRecipeIngredientDto> Ingredients { get; set; }
+        public List<int> CategoryIds { get; set; } = new();
+        public List<CreateRecipeIngredientDto> Ingredients { get; set; } = new();
     }
 }
