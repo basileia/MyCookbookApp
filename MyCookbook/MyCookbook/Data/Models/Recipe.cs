@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using MyCookbook.Validation;
+using System.ComponentModel.DataAnnotations;
 
 namespace MyCookbook.Data.Models
 {
@@ -9,8 +10,8 @@ namespace MyCookbook.Data.Models
         public string Name { get; set; }
         [Range(1, int.MaxValue, ErrorMessage = "Počet porcí musí být větší než nula.")]
         public int NumberOfServings { get; set; }
-        [Required(ErrorMessage = "Postup přípravy je povinný údaj.")]
-        public string Preparation { get; set; }
+        [NotEmptyList(ErrorMessage = "Musíš přidat alespoň jeden krok postupu.")]
+        public List<RecipeStep> Steps { get; set; } = new List<RecipeStep>();
         public List<RecipeIngredient> Ingredients { get; set; } = new List<RecipeIngredient>();
         public List<Category> Categories { get; set; } = new List<Category>();
         public DateTime DateAdded { get; set; } = DateTime.Now;
