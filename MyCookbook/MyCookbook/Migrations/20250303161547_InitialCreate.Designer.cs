@@ -9,11 +9,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace MyCookbook.Data.Migrations
+namespace MyCookbook.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250127203452_AddedRecipeAndRecipeIngredient")]
-    partial class AddedRecipeAndRecipeIngredient
+    [Migration("20250303161547_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,21 @@ namespace MyCookbook.Data.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("CategoryRecipe", b =>
+                {
+                    b.Property<int>("CategoriesId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("RecipesId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("CategoriesId", "RecipesId");
+
+                    b.HasIndex("RecipesId");
+
+                    b.ToTable("CategoryRecipe");
+                });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
@@ -233,12 +248,7 @@ namespace MyCookbook.Data.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int?>("RecipeId")
-                        .HasColumnType("integer");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("RecipeId");
 
                     b.ToTable("Categories");
 
@@ -295,14 +305,11 @@ namespace MyCookbook.Data.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.Property<int>("NumberOfServings")
                         .HasColumnType("integer");
-
-                    b.Property<string>("Preparation")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.Property<string>("UserId")
                         .IsRequired()
@@ -313,6 +320,52 @@ namespace MyCookbook.Data.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Recipes");
+                });
+
+            modelBuilder.Entity("MyCookbook.Data.Models.RecipeStep", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("RecipeId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("StepNumber")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RecipeId");
+
+                    b.ToTable("RecipeSteps");
+                });
+
+            modelBuilder.Entity("MyCookbook.Data.Models.UserRecipeStatus", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("text");
+
+                    b.Property<int>("RecipeId")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsFavourite")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsTried")
+                        .HasColumnType("boolean");
+
+                    b.HasKey("UserId", "RecipeId");
+
+                    b.HasIndex("RecipeId");
+
+                    b.ToTable("UserRecipeStatuses");
                 });
 
             modelBuilder.Entity("RecipeIngredient", b =>
@@ -335,6 +388,21 @@ namespace MyCookbook.Data.Migrations
                     b.HasIndex("IngredientId");
 
                     b.ToTable("RecipeIngredients");
+                });
+
+            modelBuilder.Entity("CategoryRecipe", b =>
+                {
+                    b.HasOne("MyCookbook.Data.Models.Category", null)
+                        .WithMany()
+                        .HasForeignKey("CategoriesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("MyCookbook.Data.Models.Recipe", null)
+                        .WithMany()
+                        .HasForeignKey("RecipesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -388,13 +456,6 @@ namespace MyCookbook.Data.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("MyCookbook.Data.Models.Category", b =>
-                {
-                    b.HasOne("MyCookbook.Data.Models.Recipe", null)
-                        .WithMany("Categories")
-                        .HasForeignKey("RecipeId");
-                });
-
             modelBuilder.Entity("MyCookbook.Data.Models.Recipe", b =>
                 {
                     b.HasOne("MyCookbook.Data.ApplicationUser", "User")
@@ -402,6 +463,36 @@ namespace MyCookbook.Data.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("MyCookbook.Data.Models.RecipeStep", b =>
+                {
+                    b.HasOne("MyCookbook.Data.Models.Recipe", "Recipe")
+                        .WithMany("Steps")
+                        .HasForeignKey("RecipeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Recipe");
+                });
+
+            modelBuilder.Entity("MyCookbook.Data.Models.UserRecipeStatus", b =>
+                {
+                    b.HasOne("MyCookbook.Data.Models.Recipe", "Recipe")
+                        .WithMany()
+                        .HasForeignKey("RecipeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("MyCookbook.Data.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Recipe");
 
                     b.Navigation("User");
                 });
@@ -415,7 +506,7 @@ namespace MyCookbook.Data.Migrations
                         .IsRequired();
 
                     b.HasOne("MyCookbook.Data.Models.Recipe", "Recipe")
-                        .WithMany("IngredientsList")
+                        .WithMany("Ingredients")
                         .HasForeignKey("RecipeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -427,9 +518,9 @@ namespace MyCookbook.Data.Migrations
 
             modelBuilder.Entity("MyCookbook.Data.Models.Recipe", b =>
                 {
-                    b.Navigation("Categories");
+                    b.Navigation("Ingredients");
 
-                    b.Navigation("IngredientsList");
+                    b.Navigation("Steps");
                 });
 #pragma warning restore 612, 618
         }

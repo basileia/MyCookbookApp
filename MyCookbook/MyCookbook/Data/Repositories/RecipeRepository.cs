@@ -19,19 +19,20 @@ namespace MyCookbook.Data.Repositories
 
         public async Task<Recipe?> GetByIdWithDetailsAsync(int id)
         {
-            return await _context.Recipes
+            var recipe = await _context.Recipes
+                .Include(r => r.Categories)
+                .Include(r => r.Ingredients)
+                .ThenInclude(ri => ri.Ingredient)
+                .Include(r => r.Steps)       
                 .Where(r => r.Id == id)
-                .Select(r => new Recipe
-                {
-                    Id = r.Id,
-                    Name = r.Name,
-                    NumberOfServings = r.NumberOfServings,
-                    UserId = r.UserId,
-                    Categories = r.Categories,
-                    Ingredients = r.Ingredients,
-                    Steps = r.Steps.OrderBy(s => s.StepNumber).ToList()
-                })
                 .FirstOrDefaultAsync();
+
+            if (recipe != null)
+            {
+                recipe.Steps = recipe.Steps.OrderBy(s => s.StepNumber).ToList();
+            }
+
+            return recipe;
         }
     }
 }

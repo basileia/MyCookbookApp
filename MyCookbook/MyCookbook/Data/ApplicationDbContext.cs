@@ -57,6 +57,12 @@ namespace MyCookbook.Data
                 .WithMany()
                 .HasForeignKey(urs => urs.RecipeId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<RecipeStep>()
+            .HasOne(rs => rs.Recipe)
+            .WithMany(r => r.Steps)
+            .HasForeignKey(rs => rs.RecipeId)
+            .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }
