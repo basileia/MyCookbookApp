@@ -30,7 +30,20 @@ else
                 }
             </div>
             <div class="recipe-preparation">
-                <p><strong>Postup:</strong> </p>
+                <p><strong>Postup:</strong></p>
+                @if (recipe.Steps == null || !recipe.Steps.Any())
+                {
+                    <p>Žádné kroky k přípravě.</p>
+                }
+                else
+                {
+                    <ol>
+                        @foreach (var step in recipe.Steps)
+                        {
+                            <li>@step.Description</li>
+                        }
+                    </ol>
+                }
             </div>
         </div>
     </div>
