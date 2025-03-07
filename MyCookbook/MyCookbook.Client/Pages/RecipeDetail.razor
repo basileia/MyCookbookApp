@@ -1,6 +1,11 @@
 ﻿@page "/recipe/{id:int}"
 @using MyCookbook.Shared.DTOs.RecipeDTOs
 @inject HttpClient Http
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+@using Microsoft.AspNetCore.Components.Authorization
+@using System.Security.Claims
+
 
 <h2>@recipe?.Name</h2>
 
@@ -45,16 +50,52 @@ else
                     </ol>
                 }
             </div>
-        </div>
+        </div>        
+
+        @if (isUserAuthenticated && recipe.UserId == currentUserId)
+        {
+            <button @onclick="DeleteRecipe" class="delete-button">Smazat</button>
+        }
     </div>
 }
 
 @code {
     [Parameter] public int Id { get; set; }
     private RecipeDetailDto? recipe;
+    private bool isUserAuthenticated;
+    private string currentUserId = "";
 
     protected override async Task OnInitializedAsync()
     {
-        recipe = await Http.GetFromJsonAsync<RecipeDetailDto>($"/api/recipe/getrecipe/{Id}");        
+        try {
+            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            var user = authState.User;
+
+            isUserAuthenticated = user.Identity?.IsAuthenticated ?? false;
+
+            if (isUserAuthenticated)
+            {
+                currentUserId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? string.Empty;
+            }
+
+            recipe = await Http.GetFromJsonAsync<RecipeDetailDto>($"/api/recipe/getrecipe/{Id}");
+        }
+        catch(Exception ex) {
+            Console.WriteLine($"Chyba: {ex.Message}");
+        }        
+    }
+
+    private async Task DeleteRecipe()
+    {
+        var response = await Http.DeleteAsync($"/api/recipe/deleterecipe/{Id}");
+
+        if (response.IsSuccessStatusCode)
+        {
+            NavigationManager.NavigateTo("/");
+        }
+        else
+        {
+            Console.WriteLine("Došlo k chybě při mazání.");
+        }
     }
 }
