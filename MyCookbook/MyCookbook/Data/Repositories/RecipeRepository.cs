@@ -33,16 +33,6 @@ namespace MyCookbook.Data.Repositories
             }
 
             return recipe;
-        }
-
-        public async Task DeleteRecipeByIdAsync(int id)
-        {
-            var recipe = await GetByIdWithDetailsAsync(id);
-            
-            if (recipe != null)
-            {
-                await DeleteAsync(recipe);
-            }
-        }
+        }        
     }
 }

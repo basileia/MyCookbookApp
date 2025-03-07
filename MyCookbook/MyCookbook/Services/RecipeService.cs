@@ -27,5 +27,23 @@ namespace MyCookbook.Services
             var recipe = await _recipeRepository.GetByIdWithDetailsAsync(id);
             return recipe == null ? null : _mapper.Map<RecipeDetailDto>(recipe);
         }
+
+        public async Task<bool> DeleteRecipeAsync(int id, string userId)
+        {
+            var recipe = await _recipeRepository.GetByIdWithDetailsAsync(id);
+
+            if (recipe == null)
+            {
+                return false;
+            }
+
+            if (recipe.UserId != userId)
+            {
+                throw new UnauthorizedAccessException("Nemáte oprávnění smazat tento recept.");
+            }
+
+            await _recipeRepository.DeleteAsync(recipe);
+            return true;
+        }
     }
 }

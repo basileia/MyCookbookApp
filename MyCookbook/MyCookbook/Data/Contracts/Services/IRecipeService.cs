@@ -6,5 +6,6 @@ namespace MyCookbook.Data.Contracts.Services
     {
         Task<List<RecipeListDto>> GetAllRecipesAsync();
         Task<RecipeDetailDto?> GetRecipeByIdAsync(int id);
+        Task<bool> DeleteRecipeAsync(int id, string userId);
     }
 }
