@@ -1,10 +1,10 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-COPY *.sln ./
-COPY MyCookbook/*.csproj ./MyCookbook/
-COPY MyCookbook.Client/*.csproj ./MyCookbook.Client/
-COPY MyCookbook.Shared/*.csproj ./MyCookbook.Shared/
+COPY MyCookbookApp/*.sln ./
+COPY MyCookbookApp/MyCookbook/*.csproj ./MyCookbook/
+COPY MyCookbookApp/MyCookbook.Client/*.csproj ./MyCookbook.Client/
+COPY MyCookbookApp/MyCookbook.Shared/*.csproj ./MyCookbook.Shared/
 
 RUN dotnet restore
 
