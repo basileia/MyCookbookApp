@@ -1,7 +1,12 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-COPY *.sln ./MyCookbook/
+COPY MyCookbookApp.sln ./
+
+RUN mkdir -p MyCookbook/MyCookbook
+RUN mkdir -p MyCookbook/MyCookbook.Client
+RUN mkdir -p MyCookbook/MyCookbook.Shared
+
 COPY ./MyCookbook/MyCookbook/*.csproj ./MyCookbook/MyCookbook/
 COPY ./MyCookbook/MyCookbook.Client/*.csproj ./MyCookbook/MyCookbook.Client/
 COPY ./MyCookbook/MyCookbook.Shared/*.csproj ./MyCookbook/MyCookbook.Shared/
