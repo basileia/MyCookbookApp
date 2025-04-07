@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-namespace MyCookbook.Shared
+namespace MyCookbook.Results
 {
-    public class Error
+    public record Error
     {
         public string Code { get; set; }  
         public string? Details { get; set; }

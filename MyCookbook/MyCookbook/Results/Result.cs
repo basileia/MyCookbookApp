@@ -1,4 +1,4 @@
-﻿namespace MyCookbook.Shared
+﻿namespace MyCookbook.Results
 {
     public class Result<TValue, TError>
     {
