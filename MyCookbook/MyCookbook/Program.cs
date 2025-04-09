@@ -10,6 +10,7 @@ using MyCookbook.Data.Contracts.Repositories;
 using MyCookbook.Data.Contracts.Services;
 using MyCookbook.Data.Repositories;
 using MyCookbook.Services;
+using static System.Net.WebRequestMethods;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +18,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddScoped(sp =>
 {
     var apiUrl = Environment.GetEnvironmentVariable("API_URL") ?? "http://localhost:5236";
+    var httpUrl = new HttpClient { BaseAddress = new Uri(apiUrl) };
+    Console.WriteLine(httpUrl);
     return new HttpClient { BaseAddress = new Uri(apiUrl) };
 });
 
