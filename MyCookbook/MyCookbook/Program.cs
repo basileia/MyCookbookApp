@@ -55,6 +55,10 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     {        
         npgsqlOptions.CommandTimeout(120); 
         npgsqlOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
+        npgsqlOptions.EnableRetryOnFailure(
+                maxRetryCount: 5,
+                maxRetryDelay: TimeSpan.FromSeconds(10),
+                errorCodesToAdd: null);
     })
 );
 
