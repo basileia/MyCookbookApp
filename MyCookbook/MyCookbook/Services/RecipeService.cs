@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using MyCookbook.Data.Contracts.Repositories;
 using MyCookbook.Data.Contracts.Services;
+using MyCookbook.Data.Models;
 using MyCookbook.Shared.DTOs.RecipeDTOs;
 
 namespace MyCookbook.Services
@@ -44,6 +45,12 @@ namespace MyCookbook.Services
 
             await _recipeRepository.DeleteAsync(recipe);
             return true;
+        }
+
+        public async Task AddNewRecipeAsync(Recipe recipe, string userId)
+        {
+            // validation, mapping
+            await _recipeRepository.AddAsync(recipe);
         }
     }
 }
