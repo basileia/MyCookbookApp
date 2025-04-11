@@ -26,6 +26,6 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        categories = await HttpClient.GetFromJsonAsync<List<CategoryDto>>("http://localhost:5236/api/category/getallcategories");
+        categories = await HttpClient.GetFromJsonAsync<List<CategoryDto>>("/api/category/getallcategories");
     }
 }
