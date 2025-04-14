@@ -53,14 +53,13 @@ namespace MyCookbook.Services
 
         public async Task<Result<RecipeDetailDto, Error>> AddNewRecipeAsync(CreateRecipeDto createRecipeDto, string userId)
         {
-            var recipe = _mapper.Map<Recipe>(createRecipeDto);
-
-            var existing = await _recipeRepository.GetByNameAsync(recipe.Name);
+            var existing = await _recipeRepository.GetByNameAsync(createRecipeDto.Name);
             if (existing is not null)
             {
                 return RecipeError.DuplicateName;
             }
 
+            var recipe = _mapper.Map<Recipe>(createRecipeDto);   
             recipe.UserId = userId;
             recipe.DateAdded = DateTime.Now;
 
@@ -69,12 +68,21 @@ namespace MyCookbook.Services
                 var categories = await _categoryRepository
                     .GetAllAsync();
 
-                recipe.Categories = categories
+                var matchedCategories = categories
                     .Where(c => createRecipeDto.CategoryIds.Contains(c.Id))
                     .ToList();
+                if (matchedCategories.Count != createRecipeDto.CategoryIds.Count)
+                {
+                    return RecipeError.InvalidCategoryIds;
+                }
+
+                recipe.Categories = matchedCategories;
             }
 
-            return await _recipeRepository.AddAsync(recipe);
+            await _recipeRepository.AddAsync(recipe);
+
+            var recipeDetailDto = _mapper.Map<RecipeDetailDto>(recipe);
+            return recipeDetailDto;
         }
     }
 }
