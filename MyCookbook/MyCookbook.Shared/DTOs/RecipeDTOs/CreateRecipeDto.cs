@@ -5,7 +5,7 @@ namespace MyCookbook.Shared.DTOs.RecipeDTOs
 {
     public class CreateRecipeDto
     {
-        [Required]
+        [Required(ErrorMessage = "Název je povinný údaj")]
         [StringLength(100, MinimumLength = 3, ErrorMessage = "Název musí mít 3-100 znaků")]
         public string Name { get; set; } = string.Empty;
 
