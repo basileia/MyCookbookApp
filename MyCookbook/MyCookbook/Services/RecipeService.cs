@@ -3,6 +3,8 @@ using MyCookbook.Data.Contracts.Repositories;
 using MyCookbook.Data.Contracts.Services;
 using MyCookbook.Data.Models;
 using MyCookbook.Shared.DTOs.RecipeDTOs;
+using MyCookbook.Results;
+using LanguageExt.Common;
 
 namespace MyCookbook.Services
 {
@@ -10,10 +12,12 @@ namespace MyCookbook.Services
     {
         private readonly IRecipeRepository _recipeRepository;
         private readonly IMapper _mapper;
+        private readonly ICategoryRepository _categoryRepository;
 
-        public RecipeService(IRecipeRepository recipeRepository, IMapper mapper)
+        public RecipeService(IRecipeRepository recipeRepository, ICategoryRepository categoryRepository, IMapper mapper)
         {
             _recipeRepository = recipeRepository;
+            _categoryRepository = categoryRepository;
             _mapper = mapper;
         }
 
@@ -47,10 +51,30 @@ namespace MyCookbook.Services
             return true;
         }
 
-        public async Task AddNewRecipeAsync(Recipe recipe, string userId)
+        public async Task<Result<RecipeDetailDto, Error>> AddNewRecipeAsync(CreateRecipeDto createRecipeDto, string userId)
         {
-            // validation, mapping
-            await _recipeRepository.AddAsync(recipe);
+            var recipe = _mapper.Map<Recipe>(createRecipeDto);
+
+            var existing = await _recipeRepository.GetByNameAsync(recipe.Name);
+            if (existing is not null)
+            {
+                return Result.Fail("Recept s tímto názvem už existuje.");
+            }
+
+            recipe.UserId = userId;
+            recipe.DateAdded = DateTime.Now;
+
+            if (createRecipeDto.CategoryIds.Any())
+            {
+                var categories = await _categoryRepository
+                    .GetAllAsync();
+
+                recipe.Categories = categories
+                    .Where(c => createRecipeDto.CategoryIds.Contains(c.Id))
+                    .ToList();
+            }
+
+            return await _recipeRepository.AddAsync(recipe);
         }
     }
 }

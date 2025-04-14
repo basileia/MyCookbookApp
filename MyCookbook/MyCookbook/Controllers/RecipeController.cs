@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MyCookbook.Data.Contracts.Services;
+using MyCookbook.Results;
 using MyCookbook.Shared.DTOs.RecipeDTOs;
 using System.Security.Claims;
 
@@ -8,7 +9,7 @@ namespace MyCookbook.Controllers
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
-    public class RecipeController : ControllerBase
+    public class RecipeController : BaseController
     {
         private readonly IRecipeService _recipeService;
 
@@ -58,5 +59,22 @@ namespace MyCookbook.Controllers
                 return Forbid();
             }
         }
+
+        [Authorize]
+        [HttpPost]
+        public async Task<ActionResult> AddRecipe([FromBody] CreateRecipeDto createRecipeDto)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized("Uživatel není přihlášen.");
+            }
+
+            var result = await _recipeService.AddNewRecipeAsync(createRecipeDto, userId);
+
+            return GetResponse(result, nameof(GetRecipe), new { id = result.Value?.Id });
+        }
+
     }
 }

@@ -33,6 +33,13 @@ namespace MyCookbook.Data.Repositories
             }
 
             return recipe;
-        }        
+        }
+
+        public async Task<Recipe?> GetByNameAsync(string name)
+        {
+            return await _context.Recipes
+                .Include(r => r.Categories)
+                .FirstOrDefaultAsync(r => r.Name.ToLower() == name.ToLower());
+        }
     }
 }

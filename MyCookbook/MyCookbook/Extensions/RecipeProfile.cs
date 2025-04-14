@@ -12,7 +12,13 @@ namespace MyCookbook.Extensions
             .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.User.UserName))
             .ForMember(dest => dest.Ingredients, opt => opt.MapFrom(src => src.Ingredients));
 
-            CreateMap<Recipe, RecipeListDto>();            
+            CreateMap<Recipe, RecipeListDto>();
+
+            CreateMap<CreateRecipeDto, Recipe>()
+            .ForMember(dest => dest.Categories, opt => opt.Ignore())
+            .ForMember(dest => dest.UserId, opt => opt.Ignore())     
+            .ForMember(dest => dest.DateAdded, opt => opt.Ignore())  
+            .ForMember(dest => dest.User, opt => opt.Ignore());
         }
     }
 }
