@@ -4,7 +4,7 @@ using MyCookbook.Data.Contracts.Services;
 using MyCookbook.Data.Models;
 using MyCookbook.Shared.DTOs.RecipeDTOs;
 using MyCookbook.Results;
-using LanguageExt.Common;
+using MyCookbook.Results.Errors;
 
 namespace MyCookbook.Services
 {
@@ -58,7 +58,7 @@ namespace MyCookbook.Services
             var existing = await _recipeRepository.GetByNameAsync(recipe.Name);
             if (existing is not null)
             {
-                return Result.Fail("Recept s tímto názvem už existuje.");
+                return RecipeError.DuplicateName;
             }
 
             recipe.UserId = userId;
