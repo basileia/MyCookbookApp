@@ -78,7 +78,7 @@ else
                 currentUserId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? string.Empty;
             }
 
-            recipe = await Http.GetFromJsonAsync<RecipeDetailDto>($"/api/recipe/getrecipe/{Id}");
+            recipe = await Http.GetFromJsonAsync<RecipeDetailDto>($"/api/recipes/{Id}");
         }
         catch(Exception ex) {
             Console.WriteLine($"Chyba: {ex.Message}");

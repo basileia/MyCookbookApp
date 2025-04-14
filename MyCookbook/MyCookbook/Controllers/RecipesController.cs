@@ -7,13 +7,13 @@ using System.Security.Claims;
 
 namespace MyCookbook.Controllers
 {
-    [Route("api/[controller]/[action]")]
+    [Route("api/[controller]")]
     [ApiController]
-    public class RecipeController : BaseController
+    public class RecipesController : BaseController
     {
         private readonly IRecipeService _recipeService;
 
-        public RecipeController(IRecipeService recipeService)
+        public RecipesController(IRecipeService recipeService)
         {
             _recipeService = recipeService;
         }

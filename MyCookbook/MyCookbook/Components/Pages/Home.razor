@@ -37,7 +37,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        recipes = await Http.GetFromJsonAsync<List<RecipeListDto>>("/api/recipe/getrecipes");
+        recipes = await Http.GetFromJsonAsync<List<RecipeListDto>>("/api/recipes");
         if (recipes == null)
         {
             Console.WriteLine("Chyba: Recepty jsou null");
