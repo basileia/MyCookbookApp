@@ -87,7 +87,7 @@ else
 
     private async Task DeleteRecipe()
     {
-        var response = await Http.DeleteAsync($"/api/recipe/deleterecipe/{Id}");
+        var response = await Http.DeleteAsync($"/api/recipes/{Id}");
 
         if (response.IsSuccessStatusCode)
         {

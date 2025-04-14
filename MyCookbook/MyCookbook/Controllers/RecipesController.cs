@@ -34,7 +34,7 @@ namespace MyCookbook.Controllers
         }
 
         [Authorize]
-        [HttpDelete("deleterecipe/{id}")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteRecipe(int id)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
