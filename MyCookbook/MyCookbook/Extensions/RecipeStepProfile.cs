@@ -8,7 +8,7 @@ namespace MyCookbook.Extensions
     {
         public RecipeStepProfile()
         {
-            CreateMap<RecipeStep, RecipeStepDto>();
+            CreateMap<RecipeStep, RecipeStepDto>().ReverseMap();
         }
     }
 }

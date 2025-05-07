@@ -18,4 +18,10 @@
     <ProjectReference Include="..\MyCookbook.Shared\MyCookbook.Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Update="Pages\TestForm.razor">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    </Content>
+  </ItemGroup>
+
 </Project>

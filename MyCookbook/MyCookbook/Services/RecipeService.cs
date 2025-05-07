@@ -54,6 +54,7 @@ namespace MyCookbook.Services
         public async Task<Result<RecipeDetailDto, Error>> AddNewRecipeAsync(CreateRecipeDto createRecipeDto, string userId)
         {
             var existing = await _recipeRepository.GetByNameAsync(createRecipeDto.Name);
+            Console.WriteLine("Existuje recept s daným názvem? " + (existing != null ? "Ano" : "Ne"));
             if (existing is not null)
             {
                 return RecipeError.DuplicateName;
@@ -61,7 +62,7 @@ namespace MyCookbook.Services
 
             var recipe = _mapper.Map<Recipe>(createRecipeDto);   
             recipe.UserId = userId;
-            recipe.DateAdded = DateTime.Now;
+            recipe.DateAdded = DateTime.UtcNow;
 
             if (createRecipeDto.CategoryIds.Any())
             {

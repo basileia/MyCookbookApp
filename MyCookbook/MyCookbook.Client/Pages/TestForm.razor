@@ -1,0 +1,35 @@
+﻿@page "/recipe/testForm"
+
+@rendermode InteractiveWebAssembly
+@using System.ComponentModel.DataAnnotations
+
+<h3>Test Formulář (Interactive WASM)</h3>
+
+<EditForm Model="@model" OnValidSubmit="HandleValidSubmit" FormName="testik">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label class="form-label">Zadej text:</label>
+        <InputText class="form-control" @bind-Value="model.Text" />
+    </div>
+
+    <p><strong>Aktuální hodnota:</strong> @model.Text</p>
+
+    <button class="btn btn-primary" type="submit">Odeslat</button>
+</EditForm>
+
+@code {
+    private TestModel model = new();
+
+    private void HandleValidSubmit()
+    {
+        Console.WriteLine($"Odesláno: {model.Text}");
+    }
+
+    public class TestModel
+    {
+        [Required(ErrorMessage = "Text je povinný")]
+        public string Text { get; set; } = "";
+    }
+}

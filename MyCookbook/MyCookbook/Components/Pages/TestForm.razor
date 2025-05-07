@@ -1,0 +1,27 @@
+﻿@* @page "/recipe/testForm"
+
+
+<h3>Test Formuláře</h3>
+
+<EditForm Model="@model" OnValidSubmit="HandleSubmit" FormName="test">
+    <div>
+        <label>Testovací pole</label>
+        <InputText @bind-Value="model.Text" />
+    </div>
+    <p>Debug: "@model.Text"</p>
+    <button type="submit">Odeslat</button>
+</EditForm>
+
+@code {
+    private TestModel model = new TestModel();
+
+    private void HandleSubmit()
+    {
+        Console.WriteLine($"Odeslání: {model.Text}");
+    }
+
+    private class TestModel
+    {
+        public string Text { get; set; } = "";
+    }
+} *@

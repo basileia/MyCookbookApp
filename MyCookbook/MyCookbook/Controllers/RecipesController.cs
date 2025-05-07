@@ -71,6 +71,7 @@ namespace MyCookbook.Controllers
                 return Unauthorized("Uživatel není přihlášen.");
             }
 
+            Console.WriteLine("Název receptu v controlleru: " + createRecipeDto.Name);
             var result = await _recipeService.AddNewRecipeAsync(createRecipeDto, userId);
 
             return GetResponse(result, nameof(GetRecipe), new { id = result.Value?.Id });
