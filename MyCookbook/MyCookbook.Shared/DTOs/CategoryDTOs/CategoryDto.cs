@@ -1,4 +1,4 @@
-﻿namespace MyCookbook.Shared.DTOs
+﻿namespace MyCookbook.Shared.DTOs.CategoryDTOs
 {
     public class CategoryDto
     {

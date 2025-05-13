@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using MyCookbook.Data.Contracts.Repositories;
 using MyCookbook.Data.Contracts.Services;
-using MyCookbook.Shared.DTOs;
+using MyCookbook.Shared.DTOs.CategoryDTOs;
 
 namespace MyCookbook.Services
 {

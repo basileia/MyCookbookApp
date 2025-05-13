@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MyCookbook.Data.Contracts.Services;
-using MyCookbook.Shared.DTOs;
+using MyCookbook.Shared.DTOs.CategoryDTOs;
 
 namespace MyCookbook.Controllers
 {
