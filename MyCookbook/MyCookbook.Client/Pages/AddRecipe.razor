@@ -22,6 +22,10 @@
                 <label for="name" class="form-label">Název receptu</label>
                 <InputText id="name" class="input-control" @bind-Value="recipe.Name" />
             </div>
+            <div class="form-field">
+                <label for="numberOfServings" class="form-label">Počet porcí</label>
+                <InputNumber id="numberOfServings" class="input-control" @bind-Value="recipe.NumberOfServings" />
+            </div>
         </div>
 
         <div class="form-actions">
@@ -37,5 +41,6 @@
     private void HandleValidSubmit()
     {
         Console.WriteLine($"Uložený recept: {recipe.Name}");
-    }    
+    }
+    
 }
