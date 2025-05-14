@@ -15,6 +15,12 @@ namespace MyCookbook.Data.Repositories
             return await _context.Ingredients
                 .OrderBy(i => i.Name)
                 .ToListAsync();
-        }        
+        }
+        
+        public async Task<Ingredient?> GetByNameAsync(string name)
+        {
+            return await _context.Ingredients
+                .FirstOrDefaultAsync(r => r.Name.ToLower() == name.ToLower());
+        }
     }
 }
