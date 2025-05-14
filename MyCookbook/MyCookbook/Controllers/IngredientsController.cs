@@ -20,5 +20,12 @@ namespace MyCookbook.Controllers
         {
             return await _ingredientService.GetAllAsync();
         }
+
+        [HttpPost]
+        public async Task<ActionResult<IngredientDto>> AddIngredient(CreateIngredientDto dto)
+        {
+            var result = await _ingredientService.AddAsync(dto);
+            return GetResponse(result, nameof(GetAll), new { id = result.Value?.Id });
+        }
     }
 }
