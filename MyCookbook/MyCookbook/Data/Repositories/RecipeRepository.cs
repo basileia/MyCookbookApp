@@ -14,6 +14,7 @@ namespace MyCookbook.Data.Repositories
         {
             return await _context.Recipes
                 .Include(r => r.Categories)
+                .OrderBy(r => r.Name)
                 .ToListAsync();
         }
 
