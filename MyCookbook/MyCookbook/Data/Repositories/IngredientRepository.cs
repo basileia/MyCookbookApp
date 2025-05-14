@@ -10,7 +10,7 @@ namespace MyCookbook.Data.Repositories
         {
         }
 
-        public async Task<List<Ingredient>> GetAllAsync()
+        public async Task<IEnumerable<Ingredient>> GetAllAsync()
         {
             return await _context.Ingredients
                 .OrderBy(i => i.Name)
