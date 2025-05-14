@@ -1,0 +1,30 @@
+﻿@page "/ingredients"
+@using MyCookbook.Shared.DTOs.IngredientDTOs
+@inject HttpClient HttpClient
+
+
+
+<h3>Ingredience</h3>
+@if (ingredients == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <ul>
+        @foreach (var ingredient in ingredients)
+        {
+            <li>@ingredient.Name</li>
+        }
+    </ul>
+}
+
+@code {
+    private List<IngredientDto> ingredients;
+
+    protected override async Task OnInitializedAsync()
+    {
+        ingredients = await HttpClient.GetFromJsonAsync<List<IngredientDto>>("/api/ingredients");
+    }
+
+}

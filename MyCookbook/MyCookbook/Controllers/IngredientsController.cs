@@ -1,0 +1,24 @@
+﻿using Microsoft.AspNetCore.Mvc;
+using MyCookbook.Data.Contracts.Services;
+using MyCookbook.Shared.DTOs.IngredientDTOs;
+
+namespace MyCookbook.Controllers
+{
+    [ApiController]
+    [Route("api/[controller]")]
+    public class IngredientsController : BaseController
+    {
+        private readonly IIngredientService _ingredientService;
+
+        public IngredientsController(IIngredientService ingredientService)
+        {
+            _ingredientService = ingredientService;
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<List<IngredientDto>>> GetAll()
+        {
+            return await _ingredientService.GetAllAsync();
+        }
+    }
+}

@@ -21,8 +21,7 @@ namespace MyCookbook.Controllers
         [HttpGet]
         public async Task<ActionResult<List<RecipeListDto>>> GetRecipes()
         {
-            var recipes = await _recipeService.GetAllRecipesAsync();
-            return Ok(recipes);
+            return await _recipeService.GetAllRecipesAsync();
         }
 
         [HttpGet("{id}")]
