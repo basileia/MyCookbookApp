@@ -17,7 +17,7 @@ namespace MyCookbook.Data.Repositories
                 .ToListAsync();
         }
 
-        public async Task<RecipeIngredient?> GetByIdsAsync(int recipeId, int ingredientId)
+        public async Task<RecipeIngredient?> FindByIdsAsync(int recipeId, int ingredientId)
         {
             return await _context.RecipeIngredients
                 .FirstOrDefaultAsync(ri => ri.RecipeId == recipeId && ri.IngredientId == ingredientId);

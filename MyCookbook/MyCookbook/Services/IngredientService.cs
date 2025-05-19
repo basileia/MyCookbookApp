@@ -11,11 +11,13 @@ namespace MyCookbook.Services
     public class IngredientService : IIngredientService
     {
         private readonly IIngredientRepository _ingredientRepository;
+        private readonly IRecipeIngredientService _recipeIngredientService;
         private readonly IMapper _mapper;
 
-        public IngredientService(IIngredientRepository ingredientRepository, IMapper mapper)
+        public IngredientService(IIngredientRepository ingredientRepository, IMapper mapper, IRecipeIngredientService recipeIngredientService)
         {
             _ingredientRepository = ingredientRepository;
+            _recipeIngredientService = recipeIngredientService;
             _mapper = mapper;               
         }
 
@@ -35,6 +37,7 @@ namespace MyCookbook.Services
             }
 
             var ingredient = _mapper.Map<Ingredient>(dto);
+            ingredient.NormalizedName = _recipeIngredientService.Normalize(ingredient.Name);
 
             await _ingredientRepository.AddAsync(ingredient);
             return _mapper.Map<IngredientDto>(ingredient);

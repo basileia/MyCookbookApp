@@ -35,6 +35,8 @@ builder.Services.AddScoped<IRecipeRepository, RecipeRepository>();
 builder.Services.AddScoped<IRecipeService, RecipeService>();
 builder.Services.AddScoped<IIngredientRepository, IngredientRepository>();
 builder.Services.AddScoped<IIngredientService, IngredientService>();
+builder.Services.AddScoped<IRecipeIngredientRepository, RecipeIngredientRepository>();
+builder.Services.AddScoped<IRecipeIngredientService, RecipeIngredientService>();
 
 builder.Services.AddAuthorization();
 builder.Services.AddAuthentication(options =>

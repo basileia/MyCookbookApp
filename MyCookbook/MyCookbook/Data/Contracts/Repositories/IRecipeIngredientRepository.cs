@@ -3,6 +3,7 @@
     public interface IRecipeIngredientRepository : IBaseRepository<RecipeIngredient>
     {
         Task<IEnumerable<RecipeIngredient>> GetByRecipeIdAsync(int recipeId);
-        Task<RecipeIngredient?> GetByIdsAsync(int recipeId, int ingredientId);
+        Task<RecipeIngredient?> FindByIdsAsync(int recipeId, int ingredientId);
+
     }
 }

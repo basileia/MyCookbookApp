@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using MyCookbook.Data.Contracts.Services;
 using MyCookbook.Results;
 using MyCookbook.Shared.DTOs.RecipeDTOs;
+using MyCookbook.Shared.DTOs.RecipeIngredientDTOs;
 using System.Security.Claims;
 
 namespace MyCookbook.Controllers
@@ -12,10 +13,12 @@ namespace MyCookbook.Controllers
     public class RecipesController : BaseController
     {
         private readonly IRecipeService _recipeService;
+        private readonly IRecipeIngredientService _recipeIngredientService;
 
-        public RecipesController(IRecipeService recipeService)
+        public RecipesController(IRecipeService recipeService, IRecipeIngredientService recipeIngredientService)
         {
             _recipeService = recipeService;
+            _recipeIngredientService = recipeIngredientService;
         }
 
         [HttpGet]
@@ -73,6 +76,14 @@ namespace MyCookbook.Controllers
             var result = await _recipeService.AddNewRecipeAsync(createRecipeDto, userId);
 
             return GetResponse(result, nameof(GetRecipe), new { id = result.Value?.Id });
+        }
+
+        [HttpPost("{recipeId}/ingredients")]
+        public async Task<IActionResult> AddIngredientToRecipe(int recipeId, [FromBody] CreateRecipeIngredientDto dto)
+        {
+            var result = await _recipeIngredientService.AddIngredientToRecipeAsync(recipeId, dto);
+
+            return GetResponse(result);                               
         }
     }
 }

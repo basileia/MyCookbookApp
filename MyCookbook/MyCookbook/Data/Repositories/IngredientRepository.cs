@@ -22,5 +22,11 @@ namespace MyCookbook.Data.Repositories
             return await _context.Ingredients
                 .FirstOrDefaultAsync(r => r.Name.ToLower() == name.ToLower());
         }
+
+        public async Task<Ingredient?> FindByNormalizedNameAsync(string normalizedName)
+        {
+            return await _context.Ingredients
+                .FirstOrDefaultAsync(i => i.NormalizedName == normalizedName);
+        }
     }
 }

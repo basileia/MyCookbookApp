@@ -6,7 +6,6 @@ namespace MyCookbook.Data.Contracts.Services
 {
     public interface IRecipeIngredientService
     {
-        Task<Result<Unit, string>> AddIngredientToRecipeAsync(int recipeId, CreateRecipeIngredientDto dto);
-        Task<Result<IEnumerable<RecipeIngredientDto>, string>> GetIngredientsForRecipeAsync(int recipeId);
+        Task<Result<RecipeIngredientDto, Error>> AddIngredientToRecipeAsync(int recipeId, CreateRecipeIngredientDto dto);
     }
 }
