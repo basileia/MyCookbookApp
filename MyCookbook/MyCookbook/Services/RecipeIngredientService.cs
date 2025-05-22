@@ -58,7 +58,7 @@ namespace MyCookbook.Services
             {
                 RecipeId = recipeId,
                 IngredientId = ingredient.Id,
-                Quantity = dto.Quantity,
+                Quantity = (double)dto.Quantity,
                 Unit = dto.Unit
             };
 

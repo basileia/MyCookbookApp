@@ -2,6 +2,7 @@
 @rendermode InteractiveWebAssembly
 @using System.ComponentModel.DataAnnotations
 @using MyCookbook.Shared.DTOs.RecipeDTOs
+@using MyCookbook.Shared.DTOs.RecipeIngredientDTOs
 
 <div class="recipe-form-container">
     <h2 class="recipe-form-title">Vložení nového receptu</h2>
@@ -19,13 +20,39 @@
             <h3 class="section-title">Základní informace</h3>
 
             <div class="form-field">
-                <label for="name" class="form-label">Název receptu</label>
-                <InputText id="name" class="input-control" @bind-Value="recipe.Name" />
+                <InputText id="name" class="input-control" placeholder="Název receptu" @bind-Value="recipe.Name" />
             </div>
             <div class="form-field">
-                <label for="numberOfServings" class="form-label">Počet porcí</label>
-                <InputNumber id="numberOfServings" class="input-control" @bind-Value="recipe.NumberOfServings" />
+                <InputNumber id="numberOfServings" class="input-control" placeholder="Počet porcí" @bind-Value="recipe.NumberOfServings" />
             </div>
+        </div>
+
+        <div class="form-section">
+            <h3 class="section-title">Ingredience</h3>
+
+            @foreach (var ingredient in recipe.Ingredients)
+            {
+                <div class="ingredient-row" @key="ingredient">
+                    <InputText class="input-control" placeholder="Název" @bind-Value="ingredient.IngredientName" />
+                    <InputNumber class="input-control" placeholder="Množství" @bind-Value="ingredient.Quantity" />
+
+                    <select class="input-control" @bind="ingredient.Unit">
+                        <option disabled selected value="">Jednotky</option>
+                        @foreach (var unit in units)
+                        {
+                            <option value="@unit">@unit</option>
+                        }
+                    </select>
+
+                    <button type="button" class="icon-button" @onclick="() => RemoveIngredient(ingredient)">
+                        <span class="icon">✖</span>
+                    </button>
+                </div>
+            }
+
+            <button type="button" class="action-button secondary" @onclick="AddIngredient">
+                Přidat ingredienci
+            </button>
         </div>
 
         <div class="form-actions">
@@ -35,12 +62,43 @@
 </div>
 
 @code {
-    private CreateRecipeDto recipe = new();
+    private CreateRecipeDto recipe = new()
+        {
+            Ingredients = new List<CreateRecipeIngredientDto>
+        {
+            new CreateRecipeIngredientDto()
+        }
+        };
+
     private string? errorMessage;
+
+    private List<string> units = new()
+    {
+        "g", "kg", "ml", "l", "ks", "lžíce", "lžička", "hrnek"
+    };
+
+    private void AddIngredient()
+    {
+        recipe.Ingredients.Add(new CreateRecipeIngredientDto());
+    }
+
+    private void RemoveIngredient(CreateRecipeIngredientDto ingredient)
+    {
+        if (recipe.Ingredients.Count > 1)
+        {
+            recipe.Ingredients.Remove(ingredient);
+        }
+        else
+        {
+            ingredient.IngredientName = string.Empty;
+            ingredient.Quantity = null;
+            ingredient.Unit = string.Empty;
+        }
+    }
 
     private void HandleValidSubmit()
     {
         Console.WriteLine($"Uložený recept: {recipe.Name}");
+        Console.WriteLine($"Počet ingrediencí: {recipe.Ingredients.Count}");
     }
-    
 }

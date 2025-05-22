@@ -37,7 +37,7 @@ namespace MyCookbook.Services
             }
 
             var ingredient = _mapper.Map<Ingredient>(dto);
-            ingredient.NormalizedName = _recipeIngredientService.Normalize(ingredient.Name);
+            ingredient.NormalizedName = Ingredient.Normalize(ingredient.Name);
 
             await _ingredientRepository.AddAsync(ingredient);
             return _mapper.Map<IngredientDto>(ingredient);
