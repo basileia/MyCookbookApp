@@ -53,6 +53,31 @@
             </button>
         </div>
 
+        <div class="form-section">
+            <h3 class="section-title">Postup</h3>
+
+            @foreach (var step in recipe.Steps)
+            {
+                <div class="step-row" @key="step">
+                    <div class="step-number">@step.StepNumber.</div>
+                    <div class="step-content">
+                        <InputTextArea class="input-control step-description"
+                        placeholder="Popis kroku"
+                        @bind-Value="step.Description" />
+                        <ValidationMessage For="@(() => step.Description)" />
+                    </div>
+                    <button type="button" class="icon-button" @onclick="() => RemoveStep(step)">
+                        <span class="icon">✖</span>
+                    </button>
+                </div>
+            }
+
+            <button type="button" class="action-button secondary" @onclick="AddStep">
+                Přidat krok
+            </button>
+        </div>
+
+
         <div class="form-actions">
             <button type="submit" class="action-button primary">Uložit recept</button>
         </div>
@@ -65,6 +90,10 @@
             Ingredients = new List<CreateRecipeIngredientDto>
         {
             new CreateRecipeIngredientDto()
+        },
+            Steps = new List<RecipeStepDto>
+        {
+            new RecipeStepDto { StepNumber = 1 }
         }
         };
 
@@ -92,6 +121,30 @@
             ingredient.Quantity = null;
             ingredient.Unit = string.Empty;
         }
+    }
+
+    private void AddStep()
+    {
+        int nextStepNumber = recipe.Steps.Count + 1;
+        recipe.Steps.Add(new RecipeStepDto { StepNumber = nextStepNumber });
+    }
+
+    private void RemoveStep(RecipeStepDto stepToRemove)
+    {
+        if (recipe.Steps.Count > 1)
+        {
+            recipe.Steps.Remove(stepToRemove);
+
+            for (int i = 0; i < recipe.Steps.Count; i++)
+            {
+                recipe.Steps[i].StepNumber = i + 1;
+            }
+        }
+        else 
+        {
+            stepToRemove.Description = string.Empty;
+            stepToRemove.StepNumber = 1;
+        }        
     }
 
     private void HandleValidSubmit()
