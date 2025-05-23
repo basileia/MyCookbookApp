@@ -1,8 +1,12 @@
 ﻿@page "/recipe/add"
 @rendermode InteractiveWebAssembly
 @using System.ComponentModel.DataAnnotations
+@using System.Net.Http.Json
+@using MyCookbook.Shared.DTOs.CategoryDTOs
 @using MyCookbook.Shared.DTOs.RecipeDTOs
 @using MyCookbook.Shared.DTOs.RecipeIngredientDTOs
+
+@inject HttpClient Http
 
 <div class="recipe-form-container">
     <h2 class="recipe-form-title">Vložení nového receptu</h2>
@@ -77,6 +81,30 @@
             </button>
         </div>
 
+        <div class="form-section">
+            <h3 class="section-title">Kategorie</h3>
+
+            @if (availableCategories == null)
+            {
+                <p>Načítám kategorie...</p>
+            }
+            else if (!availableCategories.Any())
+            {
+                <p>Žádné kategorie nebyly nalezeny.</p>
+            }
+            else
+            {
+                <div class="category-grid">
+                    @foreach (var category in availableCategories)
+                    {
+                        <div class="category-checkbox">
+                            <InputCheckbox @bind-Value="category.IsChecked" />
+                            <label>@category.Name</label>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
 
         <div class="form-actions">
             <button type="submit" class="action-button primary">Uložit recept</button>
@@ -94,15 +122,47 @@
             Steps = new List<RecipeStepDto>
         {
             new RecipeStepDto { StepNumber = 1 }
-        }
+        },
+            CategoryIds = new List<int>()
         };
 
     private string? errorMessage;
+
+    private List<SelectableCategoryDto>? availableCategories;
 
     private List<string> units = new()
     {
         "g", "kg", "ml", "l", "ks", "lžíce", "lžička", "hrnek"
     };
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var categoriesFromApi = await Http.GetFromJsonAsync<List<CategoryDto>>("/api/category/getallcategories");
+
+            if (categoriesFromApi != null)
+            {
+                availableCategories = categoriesFromApi
+                    .Select(c => new SelectableCategoryDto
+                        {
+                            Id = c.Id,
+                            Name = c.Name,
+                            IsChecked = false
+                        })
+                    .ToList();
+            }
+            else
+            {
+                availableCategories = new List<SelectableCategoryDto>();
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Nepodařilo se načíst kategorie: " + ex.Message;
+            availableCategories = new List<SelectableCategoryDto>();
+        }
+    }
 
     private void AddIngredient()
     {
@@ -149,7 +209,13 @@
 
     private void HandleValidSubmit()
     {
+        recipe.CategoryIds = availableCategories?
+            .Where(c => c.IsChecked)
+            .Select(c => c.Id)
+            .ToList() ?? new List<int>();
+
         Console.WriteLine($"Uložený recept: {recipe.Name}");
         Console.WriteLine($"Počet ingrediencí: {recipe.Ingredients.Count}");
+        Console.WriteLine($"Vybrané kategorie (ID): {string.Join(", ", recipe.CategoryIds)}");
     }
 }
