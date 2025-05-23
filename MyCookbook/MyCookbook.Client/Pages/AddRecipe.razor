@@ -19,11 +19,9 @@
         <div class="form-section">
             <h3 class="section-title">Základní informace</h3>
 
-            <div class="form-field">
+            <div class="ingredient-row">   
                 <InputText id="name" class="input-control" placeholder="Název receptu" @bind-Value="recipe.Name" />
-            </div>
-            <div class="form-field">
-                <InputNumber id="numberOfServings" class="input-control" placeholder="Počet porcí" @bind-Value="recipe.NumberOfServings" />
+                <InputNumber id="numberOfServings" class="input-control"  placeholder="Počet porcí" @bind-Value="recipe.NumberOfServings" />
             </div>
         </div>
 
