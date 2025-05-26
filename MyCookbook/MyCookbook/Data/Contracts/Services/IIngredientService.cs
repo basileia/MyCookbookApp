@@ -7,5 +7,6 @@ namespace MyCookbook.Data.Contracts.Services
     {
         Task<List<IngredientDto>> GetAllAsync();
         Task<Result<IngredientDto, Error>> AddAsync(CreateIngredientDto dto);
+        Task<Result<List<string>, Error>> SearchNamesAsync(string query);
     }
 }

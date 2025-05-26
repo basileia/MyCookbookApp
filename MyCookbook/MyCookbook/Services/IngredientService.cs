@@ -42,5 +42,22 @@ namespace MyCookbook.Services
             await _ingredientRepository.AddAsync(ingredient);
             return _mapper.Map<IngredientDto>(ingredient);
         }
+
+        public async Task<Result<List<string>, Error>> SearchNamesAsync(string query)
+        {
+            if (string.IsNullOrWhiteSpace(query))
+            {
+                return IngredientError.InvalidQuery;
+            }
+
+            var normalized = Ingredient.Normalize(query);
+            var ingredients = await _ingredientRepository.SearchByNormalizedNamePrefixAsync(normalized);
+
+            var names = ingredients
+                .Select(i => i.Name)
+                .ToList();
+
+            return names;
+        }
     }
 }
