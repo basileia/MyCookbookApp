@@ -47,6 +47,10 @@ namespace MyCookbook.Services
                 };
                 await _ingredientRepository.AddAsync(ingredient);
             }
+            else
+            {
+                dto.IngredientName = ingredient.Name;
+            }
 
             var existing = await _recipeIngredientRepository
                 .FindByIdsAsync(recipeId, ingredient.Id);

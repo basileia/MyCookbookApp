@@ -13,11 +13,15 @@ namespace MyCookbook.Services
         private readonly IRecipeRepository _recipeRepository;
         private readonly IMapper _mapper;
         private readonly ICategoryRepository _categoryRepository;
+        private readonly IRecipeIngredientService _recipeIngredientService;
+        private readonly IRecipeStepRepository _recipeStepRepository;
 
-        public RecipeService(IRecipeRepository recipeRepository, ICategoryRepository categoryRepository, IMapper mapper)
+        public RecipeService(IRecipeRepository recipeRepository, ICategoryRepository categoryRepository, IMapper mapper, IRecipeIngredientService recipeIngredientService, IRecipeStepRepository recipeStepRepository)
         {
             _recipeRepository = recipeRepository;
             _categoryRepository = categoryRepository;
+            _recipeIngredientService = recipeIngredientService;
+            _recipeStepRepository = recipeStepRepository;
             _mapper = mapper;
         }
 
@@ -54,24 +58,25 @@ namespace MyCookbook.Services
         public async Task<Result<RecipeDetailDto, Error>> AddNewRecipeAsync(CreateRecipeDto createRecipeDto, string userId)
         {
             var existing = await _recipeRepository.GetByNameAsync(createRecipeDto.Name);
-
             if (existing is not null)
             {
                 return RecipeError.DuplicateName;
             }
 
-            var recipe = _mapper.Map<Recipe>(createRecipeDto);   
+            var recipe = _mapper.Map<Recipe>(createRecipeDto);
             recipe.UserId = userId;
             recipe.DateAdded = DateTime.UtcNow;
 
+            recipe.Steps = new List<RecipeStep>();
+            recipe.Ingredients = new List<RecipeIngredient>();
+
             if (createRecipeDto.CategoryIds.Any())
             {
-                var categories = await _categoryRepository
-                    .GetAllAsync();
-
+                var categories = await _categoryRepository.GetAllAsync();
                 var matchedCategories = categories
                     .Where(c => createRecipeDto.CategoryIds.Contains(c.Id))
                     .ToList();
+
                 if (matchedCategories.Count != createRecipeDto.CategoryIds.Count)
                 {
                     return RecipeError.InvalidCategoryIds;
@@ -81,6 +86,23 @@ namespace MyCookbook.Services
             }
 
             await _recipeRepository.AddAsync(recipe);
+
+            var steps = createRecipeDto.Steps.Select(s => new RecipeStep
+            {
+                RecipeId = recipe.Id,
+                Description = s.Description,
+            }).ToList();
+
+            await _recipeStepRepository.AddRangeAsync(steps);
+
+            foreach (var ingredientDto in createRecipeDto.Ingredients)
+            {
+                var result = await _recipeIngredientService.AddIngredientToRecipeAsync(recipe.Id, ingredientDto);
+                if (!result.IsSuccess)
+                {
+                    return result.Error;
+                }
+            }
 
             var recipeDetailDto = _mapper.Map<RecipeDetailDto>(recipe);
             return recipeDetailDto;

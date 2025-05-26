@@ -7,6 +7,7 @@
 @using MyCookbook.Shared.DTOs.RecipeIngredientDTOs
 
 @inject HttpClient Http
+@inject NavigationManager Navigation
 
 <div class="recipe-form-container">
     <h2 class="recipe-form-title">Vložení nového receptu</h2>
@@ -207,15 +208,29 @@
         }        
     }
 
-    private void HandleValidSubmit()
+    private async Task HandleValidSubmit()
     {
         recipe.CategoryIds = availableCategories?
             .Where(c => c.IsChecked)
             .Select(c => c.Id)
             .ToList() ?? new List<int>();
 
-        Console.WriteLine($"Uložený recept: {recipe.Name}");
-        Console.WriteLine($"Počet ingrediencí: {recipe.Ingredients.Count}");
-        Console.WriteLine($"Vybrané kategorie (ID): {string.Join(", ", recipe.CategoryIds)}");
+        try
+        {
+            var response = await Http.PostAsJsonAsync("/api/recipes", recipe);
+
+            if (response.IsSuccessStatusCode)
+            {
+                Navigation.NavigateTo("/");
+            }
+            else
+            {
+                errorMessage = $"Nepodařilo se uložit recept: {await response.Content.ReadAsStringAsync()}";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Chyba při ukládání receptu: {ex.Message}";
+        }
     }
 }
