@@ -28,5 +28,14 @@ namespace MyCookbook.Data.Repositories
             return await _context.Ingredients
                 .FirstOrDefaultAsync(i => i.NormalizedName == normalizedName);
         }
+
+        public async Task<List<Ingredient>> SearchByNormalizedNamePrefixAsync(string prefix)
+        {
+            return await _context.Ingredients
+                .Where(i => i.NormalizedName.StartsWith(prefix))
+                .OrderBy(i => i.Name)
+                .Take(10)
+                .ToListAsync();
+        }
     }
 }

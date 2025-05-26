@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MyCookbook.Data.Contracts.Services;
+using MyCookbook.Data.Models;
 using MyCookbook.Shared.DTOs.IngredientDTOs;
 
 namespace MyCookbook.Controllers
@@ -27,5 +28,18 @@ namespace MyCookbook.Controllers
             var result = await _ingredientService.AddAsync(dto);
             return GetResponse(result, nameof(GetAll), new { id = result.Value?.Id });
         }
+
+        //[HttpGet("search")]
+        //public async Task<ActionResult<List<string>>> SearchIngredients([FromQuery] string query)
+        //{
+        //    if (string.IsNullOrWhiteSpace(query))
+        //        return BadRequest("Zadejte hledaný výraz.");
+
+        //    var normalizedQuery = Ingredient.Normalize(query);
+        //    var suggestions = await _ingredientRepository
+        //        .SearchByNormalizedNamePrefixAsync(normalizedQuery);
+
+        //    return Ok(suggestions.Select(i => i.Name).ToList());
+        //}
     }
 }
