@@ -29,17 +29,11 @@ namespace MyCookbook.Controllers
             return GetResponse(result, nameof(GetAll), new { id = result.Value?.Id });
         }
 
-        //[HttpGet("search")]
-        //public async Task<ActionResult<List<string>>> SearchIngredients([FromQuery] string query)
-        //{
-        //    if (string.IsNullOrWhiteSpace(query))
-        //        return BadRequest("Zadejte hledaný výraz.");
-
-        //    var normalizedQuery = Ingredient.Normalize(query);
-        //    var suggestions = await _ingredientRepository
-        //        .SearchByNormalizedNamePrefixAsync(normalizedQuery);
-
-        //    return Ok(suggestions.Select(i => i.Name).ToList());
-        //}
+        [HttpGet("search")]
+        public async Task<ActionResult> SearchIngredients([FromQuery] string query)
+        {
+            var result = await _ingredientService.SearchNamesAsync(query);
+            return GetResponse(result);
+        }
     }
 }
