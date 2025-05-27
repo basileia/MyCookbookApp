@@ -13,7 +13,7 @@ using MyCookbook.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-var apiUrl = builder.Configuration["API_URL"] ?? "https://localhost:7060";
+var apiUrl = Environment.GetEnvironmentVariable("API_URL") ?? "https://localhost:7060";
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(apiUrl) });
 
 builder.Services.AddRazorComponents()
