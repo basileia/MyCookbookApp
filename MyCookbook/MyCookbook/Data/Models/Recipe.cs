@@ -9,6 +9,7 @@ namespace MyCookbook.Data.Models
         [Required(ErrorMessage = "Název je povinný údaj")]
         [StringLength(100, MinimumLength = 3, ErrorMessage = "Název musí mít 3-100 znaků")]
         public string Name { get; set; } = string.Empty;
+        [Required(ErrorMessage = "Počet porcí je povinný údaj.")]
         [Range(1, int.MaxValue, ErrorMessage = "Počet porcí musí být větší než nula.")]
         public int NumberOfServings { get; set; }
         [NotEmptyList(ErrorMessage = "Musíš přidat alespoň jeden krok postupu.")]

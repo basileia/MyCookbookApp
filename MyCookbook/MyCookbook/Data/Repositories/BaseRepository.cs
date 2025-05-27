@@ -19,7 +19,7 @@ namespace MyCookbook.Data.Repositories
             return await _dbSet.FindAsync(id);
         }
 
-        public async Task<List<T>> GetAllAsync()
+        public async Task<IEnumerable<T>> GetAllAsync()
         {
             return await _dbSet.ToListAsync();
         }

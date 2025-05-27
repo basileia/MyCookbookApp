@@ -1,0 +1,117 @@
+﻿@inject HttpClient Http
+
+<div class="autocomplete-wrapper">
+    <input 
+        @bind="searchText"
+        @oninput="OnInputChanged"
+        @onkeydown="OnInputKeyDown"
+        @onblur="HideSuggestionsWithDelay"
+        @onfocus="ShowSuggestions"
+        @attributes="AdditionalAttributes"
+        class="autocomplete-input"
+    />
+
+    @if (showSuggestions && filteredIngredients?.Any() == true)
+    {
+        <ul class="autocomplete-list">
+            @foreach (var ingredient in filteredIngredients)
+            {
+                <li @onclick="() => SelectIngredient(ingredient)"
+                    class="autocomplete-item @(filteredIngredients.IndexOf(ingredient) == selectedIndex ? "selected" : "")">
+                    @ingredient
+                </li>
+            }
+        </ul>
+    }
+</div>
+
+@code {
+    private string searchText = string.Empty;
+    private List<string>? filteredIngredients;
+    private bool showSuggestions;
+
+    [Parameter]
+    public string? Value { get; set; }
+
+    [Parameter]
+    public EventCallback<string?> ValueChanged { get; set; }
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private int selectedIndex = -1;
+
+    private async Task OnInputChanged(ChangeEventArgs e)
+    {
+        searchText = e.Value?.ToString() ?? string.Empty;
+
+        if (!string.IsNullOrWhiteSpace(searchText))
+        {
+            try
+            {
+                var url = $"/api/ingredients/search?query={Uri.EscapeDataString(searchText)}";
+                filteredIngredients = await Http.GetFromJsonAsync<List<string>>(url);
+                showSuggestions = true;
+            }
+            catch
+            {
+                filteredIngredients = new List<string>();
+            }
+        }
+        else
+        {
+            filteredIngredients = new List<string>();
+            showSuggestions = false;
+        }
+
+        await ValueChanged.InvokeAsync(searchText);
+    }
+
+    private async Task SelectIngredient(string selected)
+    {
+        searchText = selected;
+        showSuggestions = false;
+
+        await ValueChanged.InvokeAsync(selected);
+    }
+
+    private void ShowSuggestions()
+    {
+        if (filteredIngredients?.Any() == true)
+        {
+            showSuggestions = true;
+        }
+    }
+
+    private async Task HideSuggestionsWithDelay()
+    {
+        await Task.Delay(200);
+        showSuggestions = false;
+    }
+
+    private async Task OnInputKeyDown(KeyboardEventArgs e)
+    {
+        if (filteredIngredients == null || filteredIngredients.Count == 0)
+            return;
+
+        if (e.Key == "ArrowDown")
+        {
+            selectedIndex++;
+            if (selectedIndex >= filteredIngredients.Count)
+                selectedIndex = 0;
+        }
+        else if (e.Key == "ArrowUp")
+        {
+            selectedIndex--;
+            if (selectedIndex < 0)
+                selectedIndex = filteredIngredients.Count - 1;
+        }
+        else if (e.Key == "Enter")
+        {
+            if (selectedIndex >= 0 && selectedIndex < filteredIngredients.Count)
+            {
+                await SelectIngredient(filteredIngredients[selectedIndex]);
+            }
+        }
+    }
+}

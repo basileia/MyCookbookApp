@@ -2,7 +2,6 @@ using AutoMapper;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using MyCookbook.Client.Pages;
 using MyCookbook.Components;
 using MyCookbook.Components.Account;
 using MyCookbook.Data;
@@ -10,18 +9,12 @@ using MyCookbook.Data.Contracts.Repositories;
 using MyCookbook.Data.Contracts.Services;
 using MyCookbook.Data.Repositories;
 using MyCookbook.Services;
-using static System.Net.WebRequestMethods;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddScoped(sp =>
-{
-    var apiUrl = Environment.GetEnvironmentVariable("API_URL") ?? "http://localhost:5236";
-    var httpUrl = new HttpClient { BaseAddress = new Uri(apiUrl) };
-    Console.WriteLine(httpUrl);
-    return new HttpClient { BaseAddress = new Uri(apiUrl) };
-});
+var apiUrl = builder.Configuration["API_URL"] ?? "https://localhost:7060";
+builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(apiUrl) });
 
 builder.Services.AddRazorComponents()
     .AddInteractiveWebAssemblyComponents();
@@ -40,6 +33,11 @@ builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IMapper, Mapper>();
 builder.Services.AddScoped<IRecipeRepository, RecipeRepository>();
 builder.Services.AddScoped<IRecipeService, RecipeService>();
+builder.Services.AddScoped<IIngredientRepository, IngredientRepository>();
+builder.Services.AddScoped<IIngredientService, IngredientService>();
+builder.Services.AddScoped<IRecipeIngredientRepository, RecipeIngredientRepository>();
+builder.Services.AddScoped<IRecipeIngredientService, RecipeIngredientService>();
+builder.Services.AddScoped<IRecipeStepRepository, RecipeStepRepository>();
 
 builder.Services.AddAuthorization();
 builder.Services.AddAuthentication(options =>

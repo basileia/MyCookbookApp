@@ -1,0 +1,237 @@
+﻿@page "/recipe/add"
+@rendermode InteractiveWebAssembly
+@using System.ComponentModel.DataAnnotations
+@using System.Net.Http.Json
+@using MyCookbook.Client.Components
+@using MyCookbook.Shared.DTOs.CategoryDTOs
+@using MyCookbook.Shared.DTOs.RecipeDTOs
+@using MyCookbook.Shared.DTOs.RecipeIngredientDTOs
+
+@inject HttpClient Http
+@inject NavigationManager Navigation
+
+<div class="recipe-form-container">
+    <h2 class="recipe-form-title">Vložení nového receptu</h2>
+
+    <EditForm Model="recipe" OnValidSubmit="HandleValidSubmit" FormName="AddRecipe">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div class="alert alert-danger mt-3">@errorMessage</div>
+        }
+
+        <div class="form-section">
+            <h3 class="section-title">Základní informace</h3>
+
+            <div class="ingredient-row">   
+                <InputText id="name" class="input-control" placeholder="Název receptu" @bind-Value="recipe.Name" />
+                <InputNumber id="numberOfServings" class="input-control"  placeholder="Počet porcí" @bind-Value="recipe.NumberOfServings" />
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h3 class="section-title">Ingredience</h3>
+
+            @foreach (var ingredient in recipe.Ingredients)
+            {
+                <div class="ingredient-row" @key="ingredient">
+                    <IngredientAutocomplete @bind-Value="ingredient.IngredientName" class="input-control" />
+                    <InputNumber class="input-control" placeholder="Množství" @bind-Value="ingredient.Quantity" />
+
+                    <select class="input-control" @bind="ingredient.Unit">
+                        <option disabled selected value="">Jednotky</option>
+                        @foreach (var unit in units)
+                        {
+                            <option value="@unit">@unit</option>
+                        }
+                    </select>
+
+                    <button type="button" class="icon-button" @onclick="() => RemoveIngredient(ingredient)">
+                        <span class="icon">✖</span>
+                    </button>
+                </div>
+            }
+
+            <button type="button" class="action-button secondary" @onclick="AddIngredient">
+                Přidat ingredienci
+            </button>
+        </div>
+
+        <div class="form-section">
+            <h3 class="section-title">Postup</h3>
+
+            @foreach (var step in recipe.Steps)
+            {
+                <div class="step-row" @key="step">
+                    <div class="step-number">@step.StepNumber.</div>
+                    <div class="step-content">
+                        <InputTextArea class="input-control step-description"
+                        placeholder="Popis kroku"
+                        @bind-Value="step.Description" />
+                        <ValidationMessage For="@(() => step.Description)" />
+                    </div>
+                    <button type="button" class="icon-button" @onclick="() => RemoveStep(step)">
+                        <span class="icon">✖</span>
+                    </button>
+                </div>
+            }
+
+            <button type="button" class="action-button secondary" @onclick="AddStep">
+                Přidat krok
+            </button>
+        </div>
+
+        <div class="form-section">
+            <h3 class="section-title">Kategorie</h3>
+
+            @if (availableCategories == null)
+            {
+                <p>Načítám kategorie...</p>
+            }
+            else if (!availableCategories.Any())
+            {
+                <p>Žádné kategorie nebyly nalezeny.</p>
+            }
+            else
+            {
+                <div class="category-grid">
+                    @foreach (var category in availableCategories)
+                    {
+                        <div class="category-checkbox">
+                            <InputCheckbox @bind-Value="category.IsChecked" />
+                            <label>@category.Name</label>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="action-button primary">Uložit recept</button>
+        </div>
+    </EditForm>
+</div>
+
+@code {
+    private CreateRecipeDto recipe = new()
+        {
+            Ingredients = new List<CreateRecipeIngredientDto>
+        {
+            new CreateRecipeIngredientDto()
+        },
+            Steps = new List<RecipeStepDto>
+        {
+            new RecipeStepDto { StepNumber = 1 }
+        },
+            CategoryIds = new List<int>()
+        };
+
+    private string? errorMessage;
+
+    private List<SelectableCategoryDto>? availableCategories;
+
+    private List<string> units = new()
+    {
+        "g", "kg", "ml", "l", "ks", "lžíce", "lžička", "hrnek"
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var categoriesFromApi = await Http.GetFromJsonAsync<List<CategoryDto>>("/api/category/getallcategories");
+
+            if (categoriesFromApi != null)
+            {
+                availableCategories = categoriesFromApi
+                    .Select(c => new SelectableCategoryDto
+                        {
+                            Id = c.Id,
+                            Name = c.Name,
+                            IsChecked = false
+                        })
+                    .ToList();
+            }
+            else
+            {
+                availableCategories = new List<SelectableCategoryDto>();
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Nepodařilo se načíst kategorie: " + ex.Message;
+            availableCategories = new List<SelectableCategoryDto>();
+        }
+    }
+
+    private void AddIngredient()
+    {
+        recipe.Ingredients.Add(new CreateRecipeIngredientDto());
+    }
+
+    private void RemoveIngredient(CreateRecipeIngredientDto ingredient)
+    {
+        if (recipe.Ingredients.Count > 1)
+        {
+            recipe.Ingredients.Remove(ingredient);
+        }
+        else
+        {
+            ingredient.IngredientName = string.Empty;
+            ingredient.Quantity = null;
+            ingredient.Unit = string.Empty;
+        }
+    }
+
+    private void AddStep()
+    {
+        int nextStepNumber = recipe.Steps.Count + 1;
+        recipe.Steps.Add(new RecipeStepDto { StepNumber = nextStepNumber });
+    }
+
+    private void RemoveStep(RecipeStepDto stepToRemove)
+    {
+        if (recipe.Steps.Count > 1)
+        {
+            recipe.Steps.Remove(stepToRemove);
+
+            for (int i = 0; i < recipe.Steps.Count; i++)
+            {
+                recipe.Steps[i].StepNumber = i + 1;
+            }
+        }
+        else 
+        {
+            stepToRemove.Description = string.Empty;
+            stepToRemove.StepNumber = 1;
+        }        
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        recipe.CategoryIds = availableCategories?
+            .Where(c => c.IsChecked)
+            .Select(c => c.Id)
+            .ToList() ?? new List<int>();
+
+        try
+        {
+            var response = await Http.PostAsJsonAsync("/api/recipes", recipe);
+
+            if (response.IsSuccessStatusCode)
+            {
+                Navigation.NavigateTo("/");
+            }
+            else
+            {
+                errorMessage = $"Nepodařilo se uložit recept: {await response.Content.ReadAsStringAsync()}";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Chyba při ukládání receptu: {ex.Message}";
+        }
+    }
+}

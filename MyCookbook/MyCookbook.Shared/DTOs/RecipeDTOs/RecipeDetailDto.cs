@@ -1,4 +1,5 @@
-﻿using MyCookbook.Shared.DTOs.RecipeIngredientDTOs;
+﻿using MyCookbook.Shared.DTOs.CategoryDTOs;
+using MyCookbook.Shared.DTOs.RecipeIngredientDTOs;
 
 namespace MyCookbook.Shared.DTOs.RecipeDTOs
 {

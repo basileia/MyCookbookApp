@@ -1,27 +1,30 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MyCookbook.Data.Contracts.Services;
+using MyCookbook.Results;
 using MyCookbook.Shared.DTOs.RecipeDTOs;
+using MyCookbook.Shared.DTOs.RecipeIngredientDTOs;
 using System.Security.Claims;
 
 namespace MyCookbook.Controllers
 {
-    [Route("api/[controller]/[action]")]
+    [Route("api/[controller]")]
     [ApiController]
-    public class RecipeController : ControllerBase
+    public class RecipesController : BaseController
     {
         private readonly IRecipeService _recipeService;
+        private readonly IRecipeIngredientService _recipeIngredientService;
 
-        public RecipeController(IRecipeService recipeService)
+        public RecipesController(IRecipeService recipeService, IRecipeIngredientService recipeIngredientService)
         {
             _recipeService = recipeService;
+            _recipeIngredientService = recipeIngredientService;
         }
 
         [HttpGet]
         public async Task<ActionResult<List<RecipeListDto>>> GetRecipes()
         {
-            var recipes = await _recipeService.GetAllRecipesAsync();
-            return Ok(recipes);
+            return await _recipeService.GetAllRecipesAsync();
         }
 
         [HttpGet("{id}")]
@@ -33,7 +36,7 @@ namespace MyCookbook.Controllers
         }
 
         [Authorize]
-        [HttpDelete("deleterecipe/{id}")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteRecipe(int id)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -57,6 +60,30 @@ namespace MyCookbook.Controllers
             {
                 return Forbid();
             }
+        }
+
+        [Authorize]
+        [HttpPost]
+        public async Task<ActionResult> AddRecipe([FromBody] CreateRecipeDto createRecipeDto)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized("Uživatel není přihlášen.");
+            }
+
+            var result = await _recipeService.AddNewRecipeAsync(createRecipeDto, userId);
+
+            return GetResponse(result, nameof(GetRecipe), new { id = result.Value?.Id });
+        }
+
+        [HttpPost("{recipeId}/ingredients")]
+        public async Task<IActionResult> AddIngredientToRecipe(int recipeId, [FromBody] CreateRecipeIngredientDto dto)
+        {
+            var result = await _recipeIngredientService.AddIngredientToRecipeAsync(recipeId, dto);
+
+            return GetResponse(result);                               
         }
     }
 }

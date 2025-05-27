@@ -7,7 +7,7 @@
 
 <PageTitle>Home</PageTitle>
 
-<h2>📖 Všechny recepty</h2>
+<h2>Všechny recepty</h2>
 
 @if (recipes == null)
 {
@@ -37,7 +37,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        recipes = await Http.GetFromJsonAsync<List<RecipeListDto>>("/api/recipe/getrecipes");
+        recipes = await Http.GetFromJsonAsync<List<RecipeListDto>>("/api/recipes");
         if (recipes == null)
         {
             Console.WriteLine("Chyba: Recepty jsou null");

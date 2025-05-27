@@ -4,7 +4,7 @@ namespace MyCookbook.Shared.DTOs.IngredientDTOs
 {
     public class CreateIngredientDto
     {
-        [Required]
-        public string Name { get; set; }
+        [Required(ErrorMessage = "Název ingredience je povinný.")]
+        public string Name { get; set; } = string.Empty;
     }
 }
