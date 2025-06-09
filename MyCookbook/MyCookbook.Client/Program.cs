@@ -4,8 +4,20 @@ using MyCookbook.Client;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 
-//var apiUrl = Environment.GetEnvironmentVariable("API_URL") ?? "https://localhost:7060";
-//builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(apiUrl) });
+string baseAddress = builder.HostEnvironment.BaseAddress;
+string apiBaseUrl;
+
+if (baseAddress.Contains("localhost"))
+{
+    apiBaseUrl = "https://localhost:7060/"; 
+}
+else
+{
+    apiBaseUrl = baseAddress;
+}
+
+builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(apiBaseUrl) });
+
 
 builder.Services.AddAuthorizationCore();
 builder.Services.AddCascadingAuthenticationState();
