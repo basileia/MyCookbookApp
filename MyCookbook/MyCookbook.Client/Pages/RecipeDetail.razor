@@ -1,11 +1,11 @@
 ﻿@page "/recipe/{id:int}"
+@rendermode InteractiveWebAssembly
 @using MyCookbook.Shared.DTOs.RecipeDTOs
 @inject HttpClient Http
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavigationManager
 @using Microsoft.AspNetCore.Components.Authorization
 @using System.Security.Claims
-
 
 <h2>@recipe?.Name</h2>
 
@@ -87,7 +87,7 @@ else
 
     private async Task DeleteRecipe()
     {
-        var response = await Http.DeleteAsync($"/api/recipes/{Id}");
+        var response = await Http.DeleteAsync($"/api/recipes/{Id}");        
 
         if (response.IsSuccessStatusCode)
         {
