@@ -42,24 +42,11 @@ namespace MyCookbook.Controllers
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
             if (string.IsNullOrEmpty(userId))
-            {
                 return Unauthorized("Uživatel není přihlášen.");
-            }
 
-            try
-            {
-                var success = await _recipeService.DeleteRecipeAsync(id, userId);
-                if (!success)
-                {
-                    return NotFound("Recept nebyl nalezen.");
-                }
+            var result = await _recipeService.DeleteRecipeAsync(id, userId);
 
-                return NoContent();
-            }
-            catch (UnauthorizedAccessException)
-            {
-                return Forbid();
-            }
+            return GetResponse(result);
         }
 
         [Authorize]

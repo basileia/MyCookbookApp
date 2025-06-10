@@ -14,6 +14,11 @@ namespace MyCookbook.Controllers
                 return NotFound(result.Error);
             }
 
+            if (result.Error is Error err && err.Code == "User.Unauthorized")
+            {
+                return Forbid();
+            }
+
             if (!result.IsSuccess)
             {
                 return BadRequest(result.Error);

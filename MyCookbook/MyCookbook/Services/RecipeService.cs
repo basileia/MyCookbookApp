@@ -5,6 +5,7 @@ using MyCookbook.Data.Models;
 using MyCookbook.Shared.DTOs.RecipeDTOs;
 using MyCookbook.Results;
 using MyCookbook.Results.Errors;
+using LanguageExt;
 
 namespace MyCookbook.Services
 {
@@ -37,22 +38,22 @@ namespace MyCookbook.Services
             return recipe == null ? null : _mapper.Map<RecipeDetailDto>(recipe);
         }
 
-        public async Task<bool> DeleteRecipeAsync(int id, string userId)
+        public async Task<Result<Unit, Error>> DeleteRecipeAsync(int id, string userId)
         {
             var recipe = await _recipeRepository.GetByIdWithDetailsAsync(id);
 
             if (recipe == null)
             {
-                return false;
+                return RecipeError.RecipeNotFound;
             }
 
             if (recipe.UserId != userId)
             {
-                throw new UnauthorizedAccessException("Nemáte oprávnění smazat tento recept.");
+                return UserError.Unauthorized;
             }
 
             await _recipeRepository.DeleteAsync(recipe);
-            return true;
+            return Unit.Default;
         }
 
         public async Task<Result<RecipeDetailDto, Error>> AddNewRecipeAsync(CreateRecipeDto createRecipeDto, string userId)
