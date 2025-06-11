@@ -64,6 +64,22 @@ namespace MyCookbook.Controllers
             return GetResponse(result, nameof(GetRecipe), new { id = result.Value?.Id });
         }
 
+        [Authorize]
+        [HttpPut("{id}")]
+        public async Task<ActionResult> UpdateRecipe(int id, [FromBody] UpdateRecipeDto updateRecipeDto)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized("Uživatel není přihlášen.");
+            }
+
+            var result = await _recipeService.UpdateRecipeAsync(id, updateRecipeDto, userId);
+
+            return GetResponse(result);
+        }
+
         [HttpPost("{recipeId}/ingredients")]
         public async Task<IActionResult> AddIngredientToRecipe(int recipeId, [FromBody] CreateRecipeIngredientDto dto)
         {
