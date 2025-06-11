@@ -108,5 +108,25 @@ namespace MyCookbook.Services
             var recipeDetailDto = _mapper.Map<RecipeDetailDto>(recipe);
             return recipeDetailDto;
         }
+
+        public async Task<Result<Unit, Error>> UpdateRecipeAsync(int id, UpdateRecipeDto updateRecipeDto, string userId)
+        {
+            var recipe = await _recipeRepository.GetByIdWithDetailsAsync(id);
+
+            if (recipe == null)
+            {
+                return RecipeError.RecipeNotFound;
+            }
+
+            if (recipe.UserId != userId)
+            {
+                return UserError.Unauthorized;
+            }
+
+            _mapper.Map(updateRecipeDto, recipe);
+            await _recipeRepository.UpdateAsync(recipe);
+
+            return Unit.Default;
+        }
     }
 }
