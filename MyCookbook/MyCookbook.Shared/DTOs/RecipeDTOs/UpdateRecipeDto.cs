@@ -10,6 +10,6 @@ namespace MyCookbook.Shared.DTOs.RecipeDTOs
         public int NumberOfServings { get; set; }
         public List<RecipeStepDto> Steps { get; set; } = new();
         public List<int> CategoryIds { get; set; } = new();
-        public List<RecipeIngredientDto> Ingredients { get; set; } = new();
+        public List<CreateRecipeIngredientDto> Ingredients { get; set; } = new();
     }
 }

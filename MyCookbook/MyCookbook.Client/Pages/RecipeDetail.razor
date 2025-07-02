@@ -55,6 +55,7 @@ else
         @if (isUserAuthenticated && recipe.UserId == currentUserId)
         {
             <button @onclick="DeleteRecipe" class="delete-button">Smazat</button>
+            <button @onclick="NavigateToUpdate" class="update-button">Upravit</button>
         }
     </div>
 }
@@ -97,5 +98,10 @@ else
         {
             Console.WriteLine("Došlo k chybě při mazání.");
         }
+    }
+
+    private void NavigateToUpdate() 
+    {
+        NavigationManager.NavigateTo($"/recipe/edit/{Id}");
     }
 }

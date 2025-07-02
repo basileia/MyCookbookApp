@@ -11,5 +11,6 @@ namespace MyCookbook.Data.Contracts.Services
         Task<Result<Unit, Error>> DeleteRecipeAsync(int id, string userId);
         Task<Result<RecipeDetailDto, Error>> AddNewRecipeAsync(CreateRecipeDto createRecipeDto, string userId);
         Task<Result<Unit, Error>> UpdateRecipeAsync(int id, UpdateRecipeDto updateRecipeDto, string userId);
+        Task<Result<UpdateRecipeDto, Error>> GetRecipeForUpdateAsync(int id);
     }
 }

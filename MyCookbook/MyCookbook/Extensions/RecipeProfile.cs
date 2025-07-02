@@ -24,6 +24,8 @@ namespace MyCookbook.Extensions
             .ForMember(dest => dest.Id, opt => opt.Ignore()) 
             .ForMember(dest => dest.UserId, opt => opt.Ignore()) 
             .ForMember(dest => dest.DateAdded, opt => opt.Ignore());
+
+            CreateMap<Recipe, UpdateRecipeDto>();
         }
     }
 }

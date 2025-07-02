@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Azure;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MyCookbook.Data.Contracts.Services;
 using MyCookbook.Shared.DTOs.RecipeDTOs;
@@ -32,6 +33,14 @@ namespace MyCookbook.Controllers
             var recipe = await _recipeService.GetRecipeByIdAsync(id);
             if (recipe == null) return NotFound("Recept nebyl nalezen");
             return Ok(recipe);
+        }
+
+        [HttpGet("update/{id}")]
+        public async Task<ActionResult<Response<UpdateRecipeDto>>> GetRecipeForUpdate(int id)
+        {
+            var result = await _recipeService.GetRecipeForUpdateAsync(id);
+
+            return GetResponse(result);
         }
 
         [Authorize]

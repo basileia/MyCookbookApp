@@ -111,6 +111,37 @@ namespace MyCookbook.Services
 
         public async Task<Result<Unit, Error>> UpdateRecipeAsync(int id, UpdateRecipeDto updateRecipeDto, string userId)
         {
+            var existingRecipe = await _recipeRepository.GetByIdWithDetailsAsync(id);
+            if (existingRecipe == null)
+            {
+                return RecipeError.RecipeNotFound;
+            }
+
+            if (existingRecipe.UserId != userId)
+            {
+                return UserError.Unauthorized;
+            }
+
+            var existingByName = await _recipeRepository.GetByNameAsync(updateRecipeDto.Name);
+            if (existingByName is not null && existingByName.Id != id)
+            {
+                return RecipeError.DuplicateName;
+            }
+
+            _mapper.Map(updateRecipeDto, existingRecipe);
+
+            var result = await _recipeIngredientService.ReplaceAllIngredientsAsync(id, updateRecipeDto.Ingredients);
+            if (!result.IsSuccess)
+            {
+                return result.Error;
+            }
+
+            await _recipeRepository.UpdateAsync(existingRecipe);
+            return Unit.Default;
+        }
+
+        public async Task<Result<UpdateRecipeDto, Error>> GetRecipeForUpdateAsync(int id)
+        {
             var recipe = await _recipeRepository.GetByIdWithDetailsAsync(id);
 
             if (recipe == null)
@@ -118,15 +149,8 @@ namespace MyCookbook.Services
                 return RecipeError.RecipeNotFound;
             }
 
-            if (recipe.UserId != userId)
-            {
-                return UserError.Unauthorized;
-            }
-
-            _mapper.Map(updateRecipeDto, recipe);
-            await _recipeRepository.UpdateAsync(recipe);
-
-            return Unit.Default;
+            var updateDto = _mapper.Map<UpdateRecipeDto>(recipe);
+            return updateDto;
         }
     }
 }

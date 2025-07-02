@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using LanguageExt;
 using MyCookbook.Data.Contracts.Repositories;
 using MyCookbook.Data.Contracts.Services;
 using MyCookbook.Data.Models;
@@ -57,7 +58,7 @@ namespace MyCookbook.Services
             if (existing != null)
                 return RecipeError.IngredientAlreadyInRecipe;
 
-
+            Console.WriteLine($"Ingredient ID: {ingredient.Id}");
             var recipeIngredient = new RecipeIngredient
             {
                 RecipeId = recipeId,
@@ -77,6 +78,27 @@ namespace MyCookbook.Services
             };
 
             return recipeIngredientDto;
+        }
+
+        public async Task<Result<Unit, Error>> ReplaceAllIngredientsAsync(int recipeId, IEnumerable<CreateRecipeIngredientDto> newIngredients)
+        {
+            var existingIngredients = await _recipeIngredientRepository.GetByRecipeIdAsync(recipeId);
+            
+            foreach (var existing in existingIngredients)
+            {
+                await _recipeIngredientRepository.DeleteAsync(existing);
+            }
+
+            foreach (var ingredientDto in newIngredients)
+            {
+                var addResult = await AddIngredientToRecipeAsync(recipeId, ingredientDto);
+                if (!addResult.IsSuccess)
+                {
+                    return addResult.Error;
+                }
+            }
+
+            return Unit.Default;
         }
     }
 }
