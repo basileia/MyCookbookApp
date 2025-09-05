@@ -12,7 +12,7 @@ namespace MyCookbook.Extensions
 
             CreateMap<RecipeIngredientDto, RecipeIngredient>();
 
-            CreateMap<CreateRecipeIngredientDto, RecipeIngredient>();
+            CreateMap<CreateRecipeIngredientDto, RecipeIngredient>().ReverseMap();
         }
     }
 }

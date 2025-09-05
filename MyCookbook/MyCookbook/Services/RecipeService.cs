@@ -109,7 +109,7 @@ namespace MyCookbook.Services
             return recipeDetailDto;
         }
 
-        public async Task<Result<Unit, Error>> UpdateRecipeAsync(int id, UpdateRecipeDto updateRecipeDto, string userId)
+        public async Task<Result<Unit, Error>> UpdateRecipeAsync(int id, CreateRecipeDto updateRecipeDto, string userId)
         {
             var existingRecipe = await _recipeRepository.GetByIdWithDetailsAsync(id);
             if (existingRecipe == null)
@@ -130,17 +130,36 @@ namespace MyCookbook.Services
 
             _mapper.Map(updateRecipeDto, existingRecipe);
 
-            var result = await _recipeIngredientService.ReplaceAllIngredientsAsync(id, updateRecipeDto.Ingredients);
+            var result = await _recipeIngredientService.ReplaceAllIngredientsAsync(existingRecipe, updateRecipeDto.Ingredients);
+
             if (!result.IsSuccess)
             {
                 return result.Error;
+            }                  
+
+            existingRecipe.Categories.Clear();
+            var categories = await _categoryRepository.GetByIdsAsync(updateRecipeDto.CategoryIds);
+
+            foreach (var category in categories)
+            {
+                existingRecipe.Categories.Add(category);
             }
 
-            await _recipeRepository.UpdateAsync(existingRecipe);
+            existingRecipe.Steps.Clear();
+            foreach (var stepDto in updateRecipeDto.Steps)
+            {
+                existingRecipe.Steps.Add(new RecipeStep
+                {
+                    StepNumber = stepDto.StepNumber,
+                    Description = stepDto.Description
+                });
+            }
+
+            await _recipeRepository.SaveAsync(existingRecipe);
             return Unit.Default;
         }
 
-        public async Task<Result<UpdateRecipeDto, Error>> GetRecipeForUpdateAsync(int id)
+        public async Task<Result<CreateRecipeDto, Error>> GetRecipeForUpdateAsync(int id)
         {
             var recipe = await _recipeRepository.GetByIdWithDetailsAsync(id);
 
@@ -149,7 +168,7 @@ namespace MyCookbook.Services
                 return RecipeError.RecipeNotFound;
             }
 
-            var updateDto = _mapper.Map<UpdateRecipeDto>(recipe);
+            var updateDto = _mapper.Map<CreateRecipeDto>(recipe);
             return updateDto;
         }
     }

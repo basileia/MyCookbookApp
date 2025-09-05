@@ -36,7 +36,7 @@ namespace MyCookbook.Controllers
         }
 
         [HttpGet("update/{id}")]
-        public async Task<ActionResult<Response<UpdateRecipeDto>>> GetRecipeForUpdate(int id)
+        public async Task<ActionResult<Response<CreateRecipeDto>>> GetRecipeForUpdate(int id)
         {
             var result = await _recipeService.GetRecipeForUpdateAsync(id);
 
@@ -75,7 +75,7 @@ namespace MyCookbook.Controllers
 
         [Authorize]
         [HttpPut("{id}")]
-        public async Task<ActionResult> UpdateRecipe(int id, [FromBody] UpdateRecipeDto updateRecipeDto)
+        public async Task<ActionResult> UpdateRecipe(int id, [FromBody] CreateRecipeDto updateRecipeDto)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 

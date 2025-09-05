@@ -57,8 +57,7 @@ namespace MyCookbook.Services
                 .FindByIdsAsync(recipeId, ingredient.Id);
             if (existing != null)
                 return RecipeError.IngredientAlreadyInRecipe;
-
-            Console.WriteLine($"Ingredient ID: {ingredient.Id}");
+        
             var recipeIngredient = new RecipeIngredient
             {
                 RecipeId = recipeId,
@@ -80,18 +79,14 @@ namespace MyCookbook.Services
             return recipeIngredientDto;
         }
 
-        public async Task<Result<Unit, Error>> ReplaceAllIngredientsAsync(int recipeId, IEnumerable<CreateRecipeIngredientDto> newIngredients)
+        public async Task<Result<Unit, Error>> ReplaceAllIngredientsAsync(Recipe existingRecipe, IEnumerable<CreateRecipeIngredientDto> ingredientDtos)
         {
-            var existingIngredients = await _recipeIngredientRepository.GetByRecipeIdAsync(recipeId);
+            existingRecipe.Ingredients.Clear();
+            await _recipeRepository.SaveAsync(existingRecipe);
             
-            foreach (var existing in existingIngredients)
+            foreach (var dto in ingredientDtos)
             {
-                await _recipeIngredientRepository.DeleteAsync(existing);
-            }
-
-            foreach (var ingredientDto in newIngredients)
-            {
-                var addResult = await AddIngredientToRecipeAsync(recipeId, ingredientDto);
+                var addResult = await AddIngredientToRecipeAsync(existingRecipe.Id, dto);
                 if (!addResult.IsSuccess)
                 {
                     return addResult.Error;
