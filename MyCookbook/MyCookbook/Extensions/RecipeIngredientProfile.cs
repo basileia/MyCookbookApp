@@ -10,7 +10,9 @@ namespace MyCookbook.Extensions
             CreateMap<RecipeIngredient, RecipeIngredientDto>()
             .ForMember(dest => dest.IngredientName, opt => opt.MapFrom(src => src.Ingredient.Name));
 
-            CreateMap<CreateRecipeIngredientDto, RecipeIngredient>();
+            CreateMap<RecipeIngredientDto, RecipeIngredient>();
+
+            CreateMap<CreateRecipeIngredientDto, RecipeIngredient>().ReverseMap();
         }
     }
 }

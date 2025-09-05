@@ -9,5 +9,6 @@ namespace MyCookbook.Data.Contracts.Repositories
         Task AddAsync(T entity);
         Task UpdateAsync(T entity);
         Task DeleteAsync(T entity);
+        Task SaveAsync(T entity);
     }
 }

@@ -1,0 +1,74 @@
+﻿@page "/recipe/edit/{RecipeId:int}"
+@rendermode InteractiveWebAssembly
+@using MyCookbook.Shared.DTOs.RecipeDTOs
+@using MyCookbook.Shared.DTOs.RecipeIngredientDTOs
+@using MyCookbook.Shared.DTOs.CategoryDTOs
+@using System.ComponentModel.DataAnnotations
+@using MyCookbook.Client.Components
+
+@inject HttpClient Http
+@inject NavigationManager Navigation
+@inject IJSRuntime JS
+
+<div class="recipe-form-container">
+    <h2 class="recipe-form-title">Úprava receptu</h2>
+    @if (isLoading)
+    {
+        <p>Načítám data...</p>
+    }
+    else
+    {     
+        <RecipeForm Recipe="recipe" AvailableCategories="categories" OnValidSubmit="SaveRecipe" @bind-ErrorMessage="errorMessage" />
+    }    
+</div>
+
+@code {
+    [Parameter]
+    public int RecipeId { get; set; }
+
+    private CreateRecipeDto recipe = new();
+    private List<SelectableCategoryDto>? categories;
+    private string errorMessage = "";
+    private bool isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        categories = await Http.GetFromJsonAsync<List<SelectableCategoryDto>>("/api/category/getallcategories");
+
+        recipe = await Http.GetFromJsonAsync<CreateRecipeDto>($"/api/recipes/update/{RecipeId}");
+
+        if (categories != null && recipe.CategoryIds != null)
+        {
+            foreach (var category in categories)
+            {
+                category.IsChecked = recipe.CategoryIds.Contains(category.Id);
+            }
+
+            for (int i = 0; i < recipe.Steps.Count; i++)
+            {
+                recipe.Steps[i].StepNumber = i + 1;
+            }
+            
+        }
+
+        isLoading = false;
+        StateHasChanged();
+    }
+
+    private async Task SaveRecipe(CreateRecipeDto recipeToSave)
+    {
+        errorMessage = "";
+        var response = await Http.PutAsJsonAsync($"/api/recipes/{RecipeId}", recipeToSave);
+        if (response.IsSuccessStatusCode)
+        {
+            Navigation.NavigateTo("/");
+        }
+        else
+        {
+            var errorContent = await response.Content.ReadFromJsonAsync<Error>();
+            errorMessage = errorContent?.Details ?? "Neznámá chyba při ukládání";
+            await JS.InvokeVoidAsync("scrollToTop");
+        }
+    }
+}
+

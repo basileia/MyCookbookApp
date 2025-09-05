@@ -1,0 +1,214 @@
+﻿@using System.ComponentModel.DataAnnotations
+@using MyCookbook.Shared.DTOs.CategoryDTOs
+@using MyCookbook.Shared.DTOs.RecipeDTOs
+@using MyCookbook.Shared.DTOs.RecipeIngredientDTOs
+@using Microsoft.AspNetCore.Components.Forms
+
+@inject IJSRuntime JS
+
+<EditForm Model="Recipe" OnValidSubmit="HandleValidSubmit" OnInvalidSubmit="HandleInvalidSubmit" FormName="RecipeForm">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    @if (ingredientErrors.Any())
+    {
+        <div class="alert alert-danger mt-3">
+            @foreach (var error in ingredientErrors)
+            {
+                <div>@error</div>
+            }
+        </div>
+    }
+
+    @if (!string.IsNullOrWhiteSpace(ErrorMessage))
+    {
+        <div class="alert alert-danger mt-3">@ErrorMessage</div>
+    }
+
+    <div class="form-section">
+        <h3 class="section-title">Základní informace</h3>
+        <div class="ingredient-row">
+                <InputText id="name" class="input-control" placeholder="Název receptu" @bind-Value="Recipe.Name" />
+                <InputNumber id="numberOfServings" class="input-control" placeholder="Počet porcí" @bind-Value="Recipe.NumberOfServings" />
+        </div>       
+    </div>
+
+    <div class="form-section">
+        <h3 class="section-title">Ingredience</h3>
+        @foreach (var ingredient in Recipe.Ingredients)
+        {
+            <div class="ingredient-row" @key="ingredient">
+                <IngredientAutocomplete @bind-Value="ingredient.IngredientName" class="input-control" />
+                <InputNumber class="input-control" placeholder="Množství" @bind-Value="ingredient.Quantity" />
+                <select class="input-control" @bind="ingredient.Unit">
+                    <option disabled selected value="">Jednotky</option>
+                    @foreach (var unit in Units)
+                    {
+                        <option value="@unit">@unit</option>
+                    }
+                </select>
+                <button type="button" class="icon-button" @onclick="() => RemoveIngredient(ingredient)">
+                    <span class="icon">✖</span>
+                </button>
+            </div>
+        }
+        <button type="button" class="action-button secondary" @onclick="AddIngredient">
+            Přidat ingredienci
+        </button>
+    </div>
+
+    <div class="form-section">
+        <h3 class="section-title">Postup</h3>
+        @foreach (var step in Recipe.Steps)
+        {
+            <div class="step-row" @key="step">
+                <div class="step-number">@step.StepNumber.</div>
+                <div class="step-content">
+                    <InputTextArea class="input-control step-description" placeholder="Popis kroku" @bind-Value="step.Description" />                    
+                </div>
+                <button type="button" class="icon-button" @onclick="() => RemoveStep(step)">
+                    <span class="icon">✖</span>
+                </button>
+            </div>
+        }
+        <button type="button" class="action-button secondary" @onclick="AddStep">
+            Přidat krok
+        </button>
+    </div>
+
+    <div class="form-section">
+        <h3 class="section-title">Kategorie</h3>
+        @if (AvailableCategories == null)
+        {
+            <p>Načítám kategorie...</p>
+        }
+        else if (!AvailableCategories.Any())
+        {
+            <p>Žádné kategorie nebyly nalezeny.</p>
+        }
+        else
+        {
+            <div class="category-grid">
+                @foreach (var category in AvailableCategories)
+                {
+                    <div class="category-checkbox">
+                        <InputCheckbox @bind-Value="category.IsChecked" />
+                        <label>@category.Name</label>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+
+    <div class="form-actions">
+        <button type="submit" class="action-button primary">Uložit recept</button>
+    </div>
+</EditForm>
+
+@code {
+    [Parameter]
+    public CreateRecipeDto Recipe { get; set; } = new();
+
+    [Parameter]
+    public List<SelectableCategoryDto>? AvailableCategories { get; set; }
+
+    [Parameter]
+    public EventCallback<CreateRecipeDto> OnValidSubmit { get; set; }
+
+    [Parameter]
+    public string ErrorMessage { get; set; } = "";
+
+    [Parameter]
+    public EventCallback<string> ErrorMessageChanged { get; set; }
+
+    private List<string> Units = new()
+    {
+        "g", "kg", "ml", "l", "ks", "lžíce", "lžička", "hrnek", "špetka"
+    };
+
+    private List<string> ingredientErrors = new List<string>();
+
+    private void AddIngredient()
+    {
+        Recipe.Ingredients.Add(new CreateRecipeIngredientDto());
+    }
+
+    private void RemoveIngredient(CreateRecipeIngredientDto ingredient)
+    {
+        if (Recipe.Ingredients.Count > 1)
+        {
+            Recipe.Ingredients.Remove(ingredient);
+        }
+        else
+        {
+            ingredient.IngredientName = string.Empty;
+            ingredient.Quantity = null;
+            ingredient.Unit = string.Empty;
+        }
+    }
+
+    private void AddStep()
+    {
+        int nextStepNumber = Recipe.Steps.Count + 1;
+        Recipe.Steps.Add(new RecipeStepDto { StepNumber = nextStepNumber });
+    }
+
+    private void RemoveStep(RecipeStepDto stepToRemove)
+    {
+        if (Recipe.Steps.Count > 1)
+        {
+            Recipe.Steps.Remove(stepToRemove);
+
+            for (int i = 0; i < Recipe.Steps.Count; i++)
+            {
+                Recipe.Steps[i].StepNumber = i + 1;
+            }
+        }
+        else
+        {
+            stepToRemove.Description = string.Empty;
+            stepToRemove.StepNumber = 1;
+        }
+    }
+
+    private bool ValidateIngredients() 
+    {
+        ingredientErrors.Clear();
+        bool isValid = true;
+
+        foreach (var ingredient in Recipe.Ingredients)
+        {
+            var context = new ValidationContext(ingredient);
+            var results = new List<ValidationResult>();
+
+            if (!Validator.TryValidateObject(ingredient, context, results, true))
+            {
+                isValid = false;
+                ingredientErrors.AddRange(results.Select(r => r.ErrorMessage));
+            }
+        }
+
+        return isValid;
+    }
+
+    private async Task HandleInvalidSubmit(EditContext editContext)
+    {
+        await JS.InvokeVoidAsync("scrollToTop");
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        Recipe.CategoryIds = AvailableCategories?
+            .Where(c => c.IsChecked)
+            .Select(c => c.Id)
+            .ToList() ?? new List<int>();
+
+        if (!ValidateIngredients())
+        {   
+            await JS.InvokeVoidAsync("scrollToTop");
+            return;
+        }
+
+        await OnValidSubmit.InvokeAsync(Recipe);
+    }
+}

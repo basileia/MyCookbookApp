@@ -7,15 +7,7 @@ namespace MyCookbook.Data.Repositories
     {
         public RecipeIngredientRepository(ApplicationDbContext context) : base(context)
         {
-        }
-
-        public async Task<IEnumerable<RecipeIngredient>> GetByRecipeIdAsync(int recipeId)
-        {
-            return await _context.RecipeIngredients
-                .Include(ri => ri.Ingredient)
-                .Where(ri => ri.RecipeId == recipeId)
-                .ToListAsync();
-        }
+        }        
 
         public async Task<RecipeIngredient?> FindByIdsAsync(int recipeId, int ingredientId)
         {

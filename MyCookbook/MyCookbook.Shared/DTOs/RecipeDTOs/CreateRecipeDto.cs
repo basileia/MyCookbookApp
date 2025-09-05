@@ -17,6 +17,7 @@ namespace MyCookbook.Shared.DTOs.RecipeDTOs
         public List<RecipeStepDto> Steps { get; set; } = new();
 
         public List<int> CategoryIds { get; set; } = new();
+        [Required]
         public List<CreateRecipeIngredientDto> Ingredients { get; set; } = new();
     }
 }

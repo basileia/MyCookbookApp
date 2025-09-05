@@ -108,5 +108,68 @@ namespace MyCookbook.Services
             var recipeDetailDto = _mapper.Map<RecipeDetailDto>(recipe);
             return recipeDetailDto;
         }
+
+        public async Task<Result<Unit, Error>> UpdateRecipeAsync(int id, CreateRecipeDto updateRecipeDto, string userId)
+        {
+            var existingRecipe = await _recipeRepository.GetByIdWithDetailsAsync(id);
+            if (existingRecipe == null)
+            {
+                return RecipeError.RecipeNotFound;
+            }
+
+            if (existingRecipe.UserId != userId)
+            {
+                return UserError.Unauthorized;
+            }
+
+            var existingByName = await _recipeRepository.GetByNameAsync(updateRecipeDto.Name);
+            if (existingByName is not null && existingByName.Id != id)
+            {
+                return RecipeError.DuplicateName;
+            }
+
+            _mapper.Map(updateRecipeDto, existingRecipe);
+
+            var result = await _recipeIngredientService.ReplaceAllIngredientsAsync(existingRecipe, updateRecipeDto.Ingredients);
+
+            if (!result.IsSuccess)
+            {
+                return result.Error;
+            }                  
+
+            existingRecipe.Categories.Clear();
+            var categories = await _categoryRepository.GetByIdsAsync(updateRecipeDto.CategoryIds);
+
+            foreach (var category in categories)
+            {
+                existingRecipe.Categories.Add(category);
+            }
+
+            existingRecipe.Steps.Clear();
+            foreach (var stepDto in updateRecipeDto.Steps)
+            {
+                existingRecipe.Steps.Add(new RecipeStep
+                {
+                    StepNumber = stepDto.StepNumber,
+                    Description = stepDto.Description
+                });
+            }
+
+            await _recipeRepository.SaveAsync(existingRecipe);
+            return Unit.Default;
+        }
+
+        public async Task<Result<CreateRecipeDto, Error>> GetRecipeForUpdateAsync(int id)
+        {
+            var recipe = await _recipeRepository.GetByIdWithDetailsAsync(id);
+
+            if (recipe == null)
+            {
+                return RecipeError.RecipeNotFound;
+            }
+
+            var updateDto = _mapper.Map<CreateRecipeDto>(recipe);
+            return updateDto;
+        }
     }
 }

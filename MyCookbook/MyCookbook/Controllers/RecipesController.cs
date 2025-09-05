@@ -1,7 +1,7 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Azure;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MyCookbook.Data.Contracts.Services;
-using MyCookbook.Results;
 using MyCookbook.Shared.DTOs.RecipeDTOs;
 using MyCookbook.Shared.DTOs.RecipeIngredientDTOs;
 using System.Security.Claims;
@@ -35,6 +35,14 @@ namespace MyCookbook.Controllers
             return Ok(recipe);
         }
 
+        [HttpGet("update/{id}")]
+        public async Task<ActionResult<Response<CreateRecipeDto>>> GetRecipeForUpdate(int id)
+        {
+            var result = await _recipeService.GetRecipeForUpdateAsync(id);
+
+            return GetResponse(result);
+        }
+
         [Authorize]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteRecipe(int id)
@@ -63,6 +71,22 @@ namespace MyCookbook.Controllers
             var result = await _recipeService.AddNewRecipeAsync(createRecipeDto, userId);
 
             return GetResponse(result, nameof(GetRecipe), new { id = result.Value?.Id });
+        }
+
+        [Authorize]
+        [HttpPut("{id}")]
+        public async Task<ActionResult> UpdateRecipe(int id, [FromBody] CreateRecipeDto updateRecipeDto)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized("Uživatel není přihlášen.");
+            }
+
+            var result = await _recipeService.UpdateRecipeAsync(id, updateRecipeDto, userId);
+
+            return GetResponse(result);
         }
 
         [HttpPost("{recipeId}/ingredients")]
