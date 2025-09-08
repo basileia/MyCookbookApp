@@ -11,13 +11,16 @@
     font-size: 1.4rem;
     font-weight: bold;
     color: #f7f7f7;
-    margin-bottom: 1rem;
+    margin-bottom: 0;
     display: block;
 }
 
 .top-row {
     background-color: #1e2a3b;
     border-bottom: 1px solid rgba(255,255,255,0.1);
+    height: 3.5rem;
+    display: flex;
+    align-items: center;
 }
 
 .nav-item {
@@ -115,7 +118,7 @@
 
     .nav-scrollable {
         display: block;
-        height: calc(100vh - 3.5rem);
+        max-height: calc(100vh - 3.5rem);
         overflow-y: auto;
     }
 }
