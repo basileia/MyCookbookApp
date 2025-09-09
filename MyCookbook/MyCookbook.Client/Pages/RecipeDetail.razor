@@ -7,58 +7,69 @@
 @using Microsoft.AspNetCore.Components.Authorization
 @using System.Security.Claims
 
-<h2>@recipe?.Name</h2>
+<PageTitle>@(recipe?.Name ?? "Recept") - My Cookbook</PageTitle>
 
-@if (recipe == null)
-{
-    <p>Načítám...</p>
-}
-else
-{
-    <div>
-        <p><strong>Počet porcí:</strong> @recipe.NumberOfServings</p>
-        <div class="recipe-container">
+<div class="recipe-form-container recipe-detail">
+    @if (recipe == null)
+    {
+        <div class="recipe-loading">
+            <i class="bi bi-clock"></i>
+            Načítám recept...
+        </div>
+    }
+    else
+    {
+        <h2>@recipe?.Name</h2>
+        <div class="recipe-detail-card">
+
+            <div class="recipe-servings">
+                <strong>Počet porcí:</strong> @recipe.NumberOfServings
+            </div>
+
             <div class="recipe-ingredients">
-                <p><strong>Suroviny:</strong></p>
+                <h3>Suroviny</h3>
                 @if (recipe.Ingredients == null || !recipe.Ingredients.Any())
                 {
-                    <p>Žádné suroviny</p>
+                    <p class="empty-ingredients">Žádné suroviny</p>
                 }
                 else
                 {
-                    <ul>
-                        @foreach (var ingredient in recipe.Ingredients)
-                        {
-                            <li>@ingredient.IngredientName @ingredient.Quantity @ingredient.Unit</li>
-                        }
-                    </ul>
+                    @foreach (var ingredient in recipe.Ingredients)
+                    {
+                        <div class="ingredient-row">@ingredient.IngredientName @ingredient.Quantity @ingredient.Unit</div>
+                    }
                 }
             </div>
+
             <div class="recipe-preparation">
-                <p><strong>Postup:</strong></p>
+                <h3>Postup</h3>
                 @if (recipe.Steps == null || !recipe.Steps.Any())
                 {
-                    <p>Žádné kroky k přípravě.</p>
+                    <p class="empty-preparation">Žádné kroky k přípravě</p>
                 }
                 else
                 {
-                    <ol>
-                        @foreach (var step in recipe.Steps)
-                        {
-                            <li>@step.Description</li>
-                        }
-                    </ol>
+                    @foreach (var step in recipe.Steps)
+                    {
+                        <div class="step-row">
+                            <div class="step-number">@step.StepNumber</div>
+                            <div class="step-content">@step.Description</div>
+                        </div>
+                    }
                 }
             </div>
-        </div>        
 
-        @if (isUserAuthenticated && recipe.UserId == currentUserId)
-        {
-            <button @onclick="DeleteRecipe" class="delete-button">Smazat</button>
-            <button @onclick="NavigateToUpdate" class="update-button">Upravit</button>
-        }
-    </div>
-}
+            @if (isUserAuthenticated && recipe.UserId == currentUserId)
+            {
+                <div class="recipe-actions">
+                    <button @onclick="DeleteRecipe" class="delete-button">Smazat</button>
+                    <button @onclick="NavigateToUpdate" class="update-button">Upravit</button>
+                </div>
+            }
+        </div>
+    }
+</div>
+
 
 @code {
     [Parameter] public int Id { get; set; }
