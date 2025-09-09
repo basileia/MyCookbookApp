@@ -1,30 +1,113 @@
-﻿.recipe-grid {
+﻿h2 {
+    color: #2c3e50;
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 2rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #e2e2e2;
+}
+
+.recipe-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 20px;
-    padding: 20px;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1.5rem;
+    padding: 0;
 }
 
 .recipe-card {
     background: #fff;
-    border-radius: 10px;
-    padding: 15px;
+    border-radius: 8px;
+    padding: 1.5rem;
     text-align: center;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     cursor: pointer;
-    transition: transform 0.2s;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    color: inherit;
+    border: 2px solid transparent;
+    position: relative;
+    overflow: hidden;
 }
 
+    .recipe-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 4px;
+        background: linear-gradient(90deg, #f7b731, #2ecc71);
+        transition: left 0.3s ease;
+    }
+
+    .recipe-card:hover::before {
+        left: 0;
+    }
+
     .recipe-card:hover {
-        transform: scale(1.05);
+        transform: translateY(-8px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        border-color: rgba(247, 183, 49, 0.3);
     }
 
     .recipe-card i {
-        font-size: 2rem;
-        color: #ff7f50;
+        font-size: 2.5rem;
+        color: #f7b731;
+        margin-bottom: 1rem;
+        transition: color 0.3s ease;
+    }
+
+    .recipe-card:hover i {
+        color: #2ecc71;
     }
 
     .recipe-card h3 {
-        font-size: 1.2rem;
-        margin-top: 10px;
+        font-size: 1.3rem;
+        margin: 0;
+        color: #2c3e50;
+        font-weight: 600;
+        transition: color 0.3s ease;
     }
+
+    .recipe-card:hover h3 {
+        color: #1e2a3b;
+    }
+
+p {
+    color: #7f8c8d;
+    font-size: 1.1rem;
+    text-align: center;
+    padding: 2rem;
+    font-style: italic;
+}
+
+@media (max-width: 768px) {
+    .recipe-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+
+    .recipe-card {
+        padding: 1rem;
+    }
+
+        .recipe-card h3 {
+            font-size: 1.1rem;
+        }
+
+        .recipe-card i {
+            font-size: 2rem;
+        }
+}
+
+@media (max-width: 480px) {
+    .recipe-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75rem;
+    }
+
+    h2 {
+        font-size: 1.5rem;
+        text-align: center;
+    }
+}
