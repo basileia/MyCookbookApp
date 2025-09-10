@@ -92,6 +92,7 @@ namespace MyCookbook.Services
             {
                 RecipeId = recipe.Id,
                 Description = s.Description,
+                StepNumber = s.StepNumber
             }).ToList();
 
             await _recipeStepRepository.AddRangeAsync(steps);
