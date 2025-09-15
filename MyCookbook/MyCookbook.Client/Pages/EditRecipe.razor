@@ -1,5 +1,7 @@
 ﻿@page "/recipe/edit/{RecipeId:int}"
 @rendermode InteractiveWebAssembly
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
 @using MyCookbook.Shared.DTOs.RecipeDTOs
 @using MyCookbook.Shared.DTOs.RecipeIngredientDTOs
 @using MyCookbook.Shared.DTOs.CategoryDTOs
