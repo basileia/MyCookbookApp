@@ -30,7 +30,7 @@
                 <h3>Suroviny</h3>
                 @if (recipe.Ingredients == null || !recipe.Ingredients.Any())
                 {
-                    <p class="empty-ingredients">Žádné suroviny</p>
+                    <p-grid class="empty-ingredients">Žádné suroviny</p-grid>
                 }
                 else
                 {
@@ -45,7 +45,7 @@
                 <h3>Postup</h3>
                 @if (recipe.Steps == null || !recipe.Steps.Any())
                 {
-                    <p class="empty-preparation">Žádné kroky k přípravě</p>
+                    <p-grid class="empty-preparation">Žádné kroky k přípravě</p-grid>
                 }
                 else
                 {
