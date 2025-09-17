@@ -45,7 +45,7 @@ namespace MyCookbook.Services
                 };
             }
 
-
+            return _mapper.Map<UserRecipeStatusDto>(status);
         }
     }
 }
