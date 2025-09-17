@@ -1,4 +1,5 @@
-﻿using MyCookbook.Data.Contracts.Repositories;
+﻿using Microsoft.EntityFrameworkCore;
+using MyCookbook.Data.Contracts.Repositories;
 using MyCookbook.Data.Models;
 
 namespace MyCookbook.Data.Repositories
@@ -9,6 +10,11 @@ namespace MyCookbook.Data.Repositories
         {
         }
 
-
+        public async Task<UserRecipeStatus?> GetStatusAsync(string userId, int recipeId)
+        {
+            return await _context.UserRecipeStatuses
+                .AsNoTracking()
+                .FirstOrDefaultAsync(s => s.UserId == userId && s.RecipeId == recipeId);
+        }
     }
 }
