@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using MyCookbook.Data.Contracts.Services;
 using MyCookbook.Shared.DTOs.RecipeDTOs;
 using MyCookbook.Shared.DTOs.RecipeIngredientDTOs;
-using System.Security.Claims;
 
 namespace MyCookbook.Controllers
 {
@@ -47,7 +46,7 @@ namespace MyCookbook.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteRecipe(int id)
         {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userId = GetUserId();
 
             if (string.IsNullOrEmpty(userId))
                 return Unauthorized("Uživatel není přihlášen.");
@@ -61,7 +60,7 @@ namespace MyCookbook.Controllers
         [HttpPost]
         public async Task<ActionResult> AddRecipe([FromBody] CreateRecipeDto createRecipeDto)
         {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userId = GetUserId();
 
             if (string.IsNullOrEmpty(userId))
             {
@@ -77,7 +76,7 @@ namespace MyCookbook.Controllers
         [HttpPut("{id}")]
         public async Task<ActionResult> UpdateRecipe(int id, [FromBody] CreateRecipeDto updateRecipeDto)
         {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userId = GetUserId();
 
             if (string.IsNullOrEmpty(userId))
             {
