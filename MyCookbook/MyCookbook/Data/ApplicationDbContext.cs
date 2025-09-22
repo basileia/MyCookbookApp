@@ -12,7 +12,7 @@ namespace MyCookbook.Data
         public DbSet<RecipeIngredient> RecipeIngredients { get; set; }
         public DbSet<UserRecipeStatus> UserRecipeStatuses { get; set; }
         public DbSet<RecipeStep> RecipeSteps { get; set; }
-
+        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

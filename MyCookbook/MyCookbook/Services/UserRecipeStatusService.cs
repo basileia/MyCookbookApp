@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using MyCookbook.Data.Contracts.Repositories;
 using MyCookbook.Data.Contracts.Services;
+using MyCookbook.Data.Models;
 using MyCookbook.Results;
 using MyCookbook.Results.Errors;
 using MyCookbook.Shared.DTOs.UserRecipeStatusDTOs;
@@ -43,6 +44,36 @@ namespace MyCookbook.Services
                     IsFavourite = false,
                     IsTried = false
                 };
+            }
+
+            return _mapper.Map<UserRecipeStatusDto>(status);
+        }
+
+        public async Task<Result<UserRecipeStatusDto, Error>> UpdateStatusAsync(string userId, UpdateUserRecipeStatusDto updateRecipeStatusDto)
+        {
+            var status = await _userRecipeStatusRepository.GetStatusAsync(userId, updateRecipeStatusDto.RecipeId);
+
+            if (status == null)
+            {
+                status = new UserRecipeStatus
+                {
+                    UserId = userId,
+                    RecipeId = updateRecipeStatusDto.RecipeId,
+                    IsFavourite = updateRecipeStatusDto.IsFavourite ?? false,
+                    IsTried = updateRecipeStatusDto.IsTried ?? false
+                };
+
+                await _userRecipeStatusRepository.AddAsync(status);
+            }
+            else
+            {
+                if (updateRecipeStatusDto.IsFavourite.HasValue)
+                    status.IsFavourite = updateRecipeStatusDto.IsFavourite.Value;
+
+                if (updateRecipeStatusDto.IsTried.HasValue)
+                    status.IsTried = updateRecipeStatusDto.IsTried.Value;
+
+                await _userRecipeStatusRepository.UpdateAsync(status);
             }
 
             return _mapper.Map<UserRecipeStatusDto>(status);

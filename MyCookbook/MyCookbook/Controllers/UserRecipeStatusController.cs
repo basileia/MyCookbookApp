@@ -30,18 +30,17 @@ namespace MyCookbook.Controllers
             return GetResponse(result);
         }
 
-        //[HttpPost("update-status")]
-        //public async Task<IActionResult> UpdateStatus(UpdateUserRecipeStatusDto updateDto)
-        //{
-        //    var userId = GetUserId();
+        [HttpPut("{recipeId}")]
+        public async Task<IActionResult> UpdateStatus(UpdateUserRecipeStatusDto updateDto)
+        {
+            var userId = GetUserId();
 
-        //    if (string.IsNullOrEmpty(userId))
-        //    {
-        //        return Unauthorized("Uživatel není přihlášen.");
-        //    }
-        //    var result = await _userRecipeStatusService.UpdateStatusAsync(userId, updateDto);
-        //    return GetResponse(result);
-        //}
-
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized("Uživatel není přihlášen.");
+            }
+            var result = await _userRecipeStatusService.UpdateStatusAsync(userId, updateDto);
+            return GetResponse(result);
+        }
     }
 }
