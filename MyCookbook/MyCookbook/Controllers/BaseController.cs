@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using MyCookbook.Results;
 using MyCookbook.Results.Errors;
+using System.Security.Claims;
 
 namespace MyCookbook.Controllers
 {
@@ -35,6 +36,11 @@ namespace MyCookbook.Controllers
             }
 
             return Ok(result.Value);
+        }
+
+        protected string GetUserId()
+        {
+            return User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         }
     }
 }

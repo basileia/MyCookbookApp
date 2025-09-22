@@ -6,6 +6,7 @@
 @inject NavigationManager NavigationManager
 @using Microsoft.AspNetCore.Components.Authorization
 @using System.Security.Claims
+@using MyCookbook.Shared.DTOs.UserRecipeStatusDTOs
 
 <PageTitle>@(recipe?.Name ?? "Recept") - My Cookbook</PageTitle>
 
@@ -22,6 +23,20 @@
         <h2>@recipe?.Name</h2>
         <div class="recipe-detail-card">
 
+            @if (isUserAuthenticated)
+            {
+                <div class="recipe-status">
+                    <label>
+                        <input type="checkbox" @bind="IsFavourite" />
+                        Oblíbené
+                    </label>
+                    <label>
+                        <input type="checkbox" @bind="IsTried" />
+                        Vyzkoušeno
+                    </label>
+                </div>
+            }
+            
             <div class="recipe-servings">
                 <strong>Počet porcí:</strong> @recipe.NumberOfServings
             </div>
@@ -76,6 +91,34 @@
     private RecipeDetailDto? recipe;
     private bool isUserAuthenticated;
     private string currentUserId = "";
+    private bool _isFavourite;
+    private bool _isTried;
+
+    private bool IsFavourite
+    {
+        get => _isFavourite;
+        set
+        {
+            if (_isFavourite != value)
+            {
+                _isFavourite = value;
+                _ = UpdateUserRecipeStatus();
+            }
+        }
+    }
+
+    private bool IsTried
+    {
+        get => _isTried;
+        set
+        {
+            if (_isTried != value)
+            {
+                _isTried = value;
+                _ = UpdateUserRecipeStatus();
+            }
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -91,6 +134,7 @@
             }
 
             recipe = await Http.GetFromJsonAsync<RecipeDetailDto>($"/api/recipes/{Id}");
+            await LoadUserRecipeStatus();
         }
         catch(Exception ex) {
             Console.WriteLine($"Chyba: {ex.Message}");
@@ -114,5 +158,49 @@
     private void NavigateToUpdate() 
     {
         NavigationManager.NavigateTo($"/recipe/edit/{Id}");
+    }
+
+    private async Task LoadUserRecipeStatus()
+    {
+        if (!isUserAuthenticated)
+            return;
+
+        try
+        {
+            var status = await Http.GetFromJsonAsync<UserRecipeStatusDto>($"/api/userRecipeStatus/{Id}");
+            if (status != null)
+            {
+                _isFavourite = status.IsFavourite;
+                _isTried = status.IsTried;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Chyba při načítání statusu: {ex.Message}");
+        }
+    }
+
+    private async Task UpdateUserRecipeStatus()
+    {
+        try
+        {
+            var dto = new UpdateUserRecipeStatusDto
+            {
+                RecipeId = Id,
+                IsFavourite = _isFavourite,
+                IsTried = _isTried
+            };
+
+            var response = await Http.PutAsJsonAsync($"/api/userRecipeStatus/{Id}", dto);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                Console.WriteLine("Nepodařilo se aktualizovat status receptu.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Chyba při aktualizaci statusu: {ex.Message}");
+        }
     }
 }
