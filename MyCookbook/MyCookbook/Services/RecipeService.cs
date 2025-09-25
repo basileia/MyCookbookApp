@@ -6,6 +6,7 @@ using MyCookbook.Shared.DTOs.RecipeDTOs;
 using MyCookbook.Results;
 using MyCookbook.Results.Errors;
 using LanguageExt;
+using MyCookbook.Shared.DTOs;
 
 namespace MyCookbook.Services
 {
@@ -171,6 +172,11 @@ namespace MyCookbook.Services
 
             var updateDto = _mapper.Map<CreateRecipeDto>(recipe);
             return updateDto;
+        }
+
+        public async Task<Result<List<RecipeListDto>, Error>> GetFilteredRecipesAsync(FilterCriteriaDto filter, string userId)
+        {
+            return;
         }
     }
 }

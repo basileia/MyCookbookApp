@@ -1,5 +1,6 @@
 ﻿using LanguageExt;
 using MyCookbook.Results;
+using MyCookbook.Shared.DTOs;
 using MyCookbook.Shared.DTOs.RecipeDTOs;
 
 namespace MyCookbook.Data.Contracts.Services
@@ -12,5 +13,6 @@ namespace MyCookbook.Data.Contracts.Services
         Task<Result<RecipeDetailDto, Error>> AddNewRecipeAsync(CreateRecipeDto createRecipeDto, string userId);
         Task<Result<Unit, Error>> UpdateRecipeAsync(int id, CreateRecipeDto updateRecipeDto, string userId);
         Task<Result<CreateRecipeDto, Error>> GetRecipeForUpdateAsync(int id);
+        Task<Result<List<RecipeListDto>, Error>> GetFilteredRecipesAsync(FilterCriteriaDto filter, string userId);
     }
 }
