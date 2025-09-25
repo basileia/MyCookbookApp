@@ -1,12 +1,12 @@
 ﻿using AutoMapper;
+using LanguageExt;
 using MyCookbook.Data.Contracts.Repositories;
 using MyCookbook.Data.Contracts.Services;
 using MyCookbook.Data.Models;
-using MyCookbook.Shared.DTOs.RecipeDTOs;
 using MyCookbook.Results;
 using MyCookbook.Results.Errors;
-using LanguageExt;
 using MyCookbook.Shared.DTOs;
+using MyCookbook.Shared.DTOs.RecipeDTOs;
 
 namespace MyCookbook.Services
 {
@@ -176,7 +176,11 @@ namespace MyCookbook.Services
 
         public async Task<Result<List<RecipeListDto>, Error>> GetFilteredRecipesAsync(FilterCriteriaDto filter, string userId)
         {
-            return;
+            var recipes = await _recipeRepository.GetFilteredAsync(filter, userId);
+
+            var recipeDtos = _mapper.Map<List<RecipeListDto>>(recipes);
+
+            return recipeDtos;
         }
     }
 }
