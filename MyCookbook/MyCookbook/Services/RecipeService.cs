@@ -26,13 +26,7 @@ namespace MyCookbook.Services
             _recipeStepRepository = recipeStepRepository;
             _mapper = mapper;
         }
-
-        public async Task<List<RecipeListDto>> GetAllRecipesAsync()
-        {
-            var recipes = await _recipeRepository.GetAllWithCategoriesAsync();
-            return _mapper.Map<List<RecipeListDto>>(recipes);
-        }
-
+               
         public async Task<RecipeDetailDto?> GetRecipeByIdAsync(int id)
         {
             var recipe = await _recipeRepository.GetByIdWithDetailsAsync(id);

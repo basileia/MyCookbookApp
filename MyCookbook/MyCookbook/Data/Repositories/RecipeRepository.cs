@@ -11,14 +11,6 @@ namespace MyCookbook.Data.Repositories
         {
         }
 
-        public async Task<List<Recipe>> GetAllWithCategoriesAsync()
-        {
-            return await _context.Recipes
-                .Include(r => r.Categories)
-                .OrderBy(r => r.Name)
-                .ToListAsync();
-        }
-
         public async Task<Recipe?> GetByIdWithDetailsAsync(int id)
         {
             var recipe = await _context.Recipes
@@ -46,7 +38,10 @@ namespace MyCookbook.Data.Repositories
 
         public async Task<List<Recipe?>> GetFilteredAsync(FilterCriteriaDto filter, string userId)
         {
-            var query = _context.Recipes.AsQueryable();
+            var query = _context.Recipes
+                .Include(r => r.Categories)
+                .OrderBy(r => r.Name)
+                .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(filter.SearchText))
                 query = query.Where(r => r.Name.Contains(filter.SearchText, StringComparison.OrdinalIgnoreCase));

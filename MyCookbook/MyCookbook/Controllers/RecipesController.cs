@@ -19,13 +19,7 @@ namespace MyCookbook.Controllers
         {
             _recipeService = recipeService;
             _recipeIngredientService = recipeIngredientService;
-        }
-
-        [HttpGet]
-        public async Task<ActionResult<List<RecipeListDto>>> GetRecipes()
-        {
-            return await _recipeService.GetAllRecipesAsync();
-        }
+        }      
 
         [HttpGet("{id}")]
         public async Task<ActionResult<RecipeDetailDto>> GetRecipe(int id)
