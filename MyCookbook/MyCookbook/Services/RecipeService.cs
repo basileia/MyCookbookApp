@@ -170,6 +170,13 @@ namespace MyCookbook.Services
 
         public async Task<Result<List<RecipeListDto>, Error>> GetFilteredRecipesAsync(FilterCriteriaDto filter, string userId)
         {
+            bool requiresAuth = filter.Favorites == true || filter.Tried == true || filter.Mine == true;
+
+            if (requiresAuth && string.IsNullOrEmpty(userId))
+            {
+                return UserError.Unauthorized;
+            }
+
             var recipes = await _recipeRepository.GetFilteredAsync(filter, userId);
 
             var recipeDtos = _mapper.Map<List<RecipeListDto>>(recipes);
