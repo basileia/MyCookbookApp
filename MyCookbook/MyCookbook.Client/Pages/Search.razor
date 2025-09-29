@@ -1,0 +1,196 @@
+﻿@page "/search"
+@rendermode InteractiveWebAssembly
+
+@using MyCookbook.Client.Components
+@using MyCookbook.Shared.DTOs
+@using MyCookbook.Shared.DTOs.RecipeDTOs
+@using System.Web
+@inject HttpClient Http
+@inject NavigationManager Navigation
+
+<PageTitle>Vyhledávání - My Cookbook</PageTitle>
+
+<div class="page-header">
+    <h2>Vyhledávání receptů</h2>
+</div>
+
+@if (!hasSearched)
+{
+    <RecipeFilter OnFilterChanged="LoadRecipes" />
+}
+
+@if (hasSearched)
+{
+    <button class="action-button secondary mb-3" @onclick="ResetSearch">
+        ← Zpět k vyhledávání
+    </button>
+
+    @if (recipes == null || recipes.Count == 0)
+    {
+        <p>Žádné recepty neodpovídají zadaným kritériím.</p>
+    }
+    else
+    {
+        <div class="recipe-grid">
+            @foreach (var recipe in recipes)
+            {
+                <NavLink class="recipe-card" href="@($"/recipe/{recipe.Id}")">
+                    @if (recipe.Icons != null)
+                    {
+                        @foreach (var icon in recipe.Icons)
+                        {
+                            <i class="@icon me-2"></i>
+                        }
+                    }
+                    <h3>@recipe.Name</h3>
+                </NavLink>
+            }
+        </div>
+    }
+}
+
+@code {
+    private List<RecipeListDto>? recipes;
+    private bool hasSearched = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Navigation.LocationChanged += OnLocationChanged;
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await LoadFromUrl();
+    }
+
+    private async Task LoadFromUrl()
+    {
+        var uri = new Uri(Navigation.Uri);
+        var query = HttpUtility.ParseQueryString(uri.Query);
+
+        var searchText = query["SearchText"] ?? string.Empty;
+        var ingredient = query["Ingredient"] ?? string.Empty;
+        var favorites = query["Favorites"] == "true";
+        var tried = query["Tried"] == "true";
+        var mine = query["Mine"] == "true";
+
+        bool hasParams = !string.IsNullOrWhiteSpace(searchText) ||
+                         !string.IsNullOrWhiteSpace(ingredient) ||
+                         favorites ||
+                         tried ||
+                         mine;
+
+        if (hasParams)
+        {
+            hasSearched = true;
+
+            var criteria = new FilterCriteriaDto
+            {
+                SearchText = searchText,
+                Ingredient = ingredient,
+                Favorites = favorites,
+                Tried = tried,
+                Mine = mine
+            };
+
+            await LoadRecipesFromApi(criteria);
+        }
+        else
+        {
+            hasSearched = false;
+            recipes = null;
+        }
+    }
+
+    private async Task LoadRecipes(FilterCriteriaDto criteria)
+    {
+        try
+        {
+            var queryParams = new List<string>();
+
+            if (!string.IsNullOrWhiteSpace(criteria.SearchText))
+                queryParams.Add($"SearchText={HttpUtility.UrlEncode(criteria.SearchText)}");
+
+            if (!string.IsNullOrWhiteSpace(criteria.Ingredient))
+                queryParams.Add($"Ingredient={HttpUtility.UrlEncode(criteria.Ingredient)}");
+
+            if (criteria.Favorites == true)
+                queryParams.Add("Favorites=true");
+
+            if (criteria.Tried == true)
+                queryParams.Add("Tried=true");
+
+            if (criteria.Mine == true)
+                queryParams.Add("Mine=true");
+
+            var queryString = queryParams.Count > 0
+                ? "?" + string.Join("&", queryParams)
+                : string.Empty;
+
+            Navigation.NavigateTo($"/search{queryString}", forceLoad: false);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading recipes: {ex.Message}");
+            recipes = new List<RecipeListDto>();
+            hasSearched = true;
+        }
+    }
+
+    private async Task LoadRecipesFromApi(FilterCriteriaDto criteria)
+    {
+        try
+        {
+            var queryParams = new List<string>();
+
+            if (!string.IsNullOrWhiteSpace(criteria.SearchText))
+                queryParams.Add($"SearchText={HttpUtility.UrlEncode(criteria.SearchText)}");
+
+            if (!string.IsNullOrWhiteSpace(criteria.Ingredient))
+                queryParams.Add($"Ingredient={HttpUtility.UrlEncode(criteria.Ingredient)}");
+
+            if (criteria.Favorites == true)
+                queryParams.Add("Favorites=true");
+
+            if (criteria.Tried == true)
+                queryParams.Add("Tried=true");
+
+            if (criteria.Mine == true)
+                queryParams.Add("Mine=true");
+
+            var queryString = queryParams.Count > 0
+                ? "?" + string.Join("&", queryParams)
+                : string.Empty;
+
+            var url = $"/api/recipes{queryString}";
+
+            recipes = await Http.GetFromJsonAsync<List<RecipeListDto>>(url);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading recipes: {ex.Message}");
+            recipes = new List<RecipeListDto>();
+        }
+    }
+
+    private void ResetSearch()
+    {
+        hasSearched = false;
+        recipes = null;
+        Navigation.NavigateTo("/search", forceLoad: false);
+    }
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        InvokeAsync(async () =>
+        {
+            await LoadFromUrl();
+            StateHasChanged();
+        });
+    }
+
+    public void Dispose()
+    {
+        Navigation.LocationChanged -= OnLocationChanged;
+    }
+}

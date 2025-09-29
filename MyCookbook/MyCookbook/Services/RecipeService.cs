@@ -1,11 +1,12 @@
 ﻿using AutoMapper;
+using LanguageExt;
 using MyCookbook.Data.Contracts.Repositories;
 using MyCookbook.Data.Contracts.Services;
 using MyCookbook.Data.Models;
-using MyCookbook.Shared.DTOs.RecipeDTOs;
 using MyCookbook.Results;
 using MyCookbook.Results.Errors;
-using LanguageExt;
+using MyCookbook.Shared.DTOs;
+using MyCookbook.Shared.DTOs.RecipeDTOs;
 
 namespace MyCookbook.Services
 {
@@ -25,13 +26,7 @@ namespace MyCookbook.Services
             _recipeStepRepository = recipeStepRepository;
             _mapper = mapper;
         }
-
-        public async Task<List<RecipeListDto>> GetAllRecipesAsync()
-        {
-            var recipes = await _recipeRepository.GetAllWithCategoriesAsync();
-            return _mapper.Map<List<RecipeListDto>>(recipes);
-        }
-
+               
         public async Task<RecipeDetailDto?> GetRecipeByIdAsync(int id)
         {
             var recipe = await _recipeRepository.GetByIdWithDetailsAsync(id);
@@ -171,6 +166,22 @@ namespace MyCookbook.Services
 
             var updateDto = _mapper.Map<CreateRecipeDto>(recipe);
             return updateDto;
+        }
+
+        public async Task<Result<List<RecipeListDto>, Error>> GetFilteredRecipesAsync(FilterCriteriaDto filter, string userId)
+        {
+            bool requiresAuth = filter.Favorites == true || filter.Tried == true || filter.Mine == true;
+
+            if (requiresAuth && string.IsNullOrEmpty(userId))
+            {
+                return UserError.Unauthorized;
+            }
+
+            var recipes = await _recipeRepository.GetFilteredAsync(filter, userId);
+
+            var recipeDtos = _mapper.Map<List<RecipeListDto>>(recipes);
+
+            return recipeDtos;
         }
     }
 }

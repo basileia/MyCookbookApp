@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MyCookbook.Data.Contracts.Services;
+using MyCookbook.Shared.DTOs;
 using MyCookbook.Shared.DTOs.RecipeDTOs;
 using MyCookbook.Shared.DTOs.RecipeIngredientDTOs;
 
@@ -18,13 +19,7 @@ namespace MyCookbook.Controllers
         {
             _recipeService = recipeService;
             _recipeIngredientService = recipeIngredientService;
-        }
-
-        [HttpGet]
-        public async Task<ActionResult<List<RecipeListDto>>> GetRecipes()
-        {
-            return await _recipeService.GetAllRecipesAsync();
-        }
+        }      
 
         [HttpGet("{id}")]
         public async Task<ActionResult<RecipeDetailDto>> GetRecipe(int id)
@@ -32,6 +27,21 @@ namespace MyCookbook.Controllers
             var recipe = await _recipeService.GetRecipeByIdAsync(id);
             if (recipe == null) return NotFound("Recept nebyl nalezen");
             return Ok(recipe);
+        }
+
+        [HttpGet]
+        public async Task<ActionResult> Get([FromQuery] FilterCriteriaDto filter)
+        {
+            string userId = null;
+
+            if (User.Identity?.IsAuthenticated == true)
+            {
+                userId = GetUserId();
+            }
+
+            var result = await _recipeService.GetFilteredRecipesAsync(filter, userId);
+
+            return GetResponse(result);
         }
 
         [HttpGet("update/{id}")]

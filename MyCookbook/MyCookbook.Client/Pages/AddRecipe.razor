@@ -12,9 +12,12 @@
 @inject NavigationManager Navigation
 @inject IJSRuntime JS
 
-<div class="recipe-form-container">
-    <h2> Vložení nového receptu</h2>
+<div class="page-header">
+    <h2>Vložení nového receptu</h2>
+</div>
 
+<div class="recipe-form-container">
+    
     @if (isLoading)
     {
         <p>Načítám data...</p>
