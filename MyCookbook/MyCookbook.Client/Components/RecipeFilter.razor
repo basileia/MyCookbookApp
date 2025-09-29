@@ -1,1 +1,83 @@
-﻿
+﻿@using MyCookbook.Shared.DTOs
+@using Microsoft.AspNetCore.Components.Authorization
+
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<div class="recipe-form-container">
+    <div class="form-section">
+
+        <div class="mb-3">
+            <input type="text"
+                   class="input-control"
+                   placeholder="Hledat podle názvu..."
+                   @bind="FilterCriteria.SearchText" />
+        </div>
+
+        <div class="mb-3">
+            <input type="text"
+                   class="input-control"
+                   placeholder="Hledat podle ingredience..."
+                   @bind="FilterCriteria.Ingredient" />
+        </div>
+
+        @if (isUserAuthenticated) 
+        {
+            <div class="category-grid">
+                <label class="category-checkbox">
+                    <input type="checkbox" @bind="FilterCriteria.Favorites" />
+                    Oblíbené
+                </label>
+                <label class="category-checkbox">
+                    <input type="checkbox" @bind="FilterCriteria.Tried" />
+                    Vyzkoušeno
+                </label>
+                <label class="category-checkbox">
+                    <input type="checkbox" @bind="FilterCriteria.Mine" />
+                    Moje
+                </label>
+            </div>
+        }
+
+        <div class="form-actions">
+            <button class="action-button primary" type="button" @onclick="OnSearch">Vyhledat</button>
+            <button class="action-button secondary" type="button" @onclick="OnReset">Reset</button>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public FilterCriteriaDto FilterCriteria { get; set; } = new();
+    [Parameter] public EventCallback<FilterCriteriaDto> OnFilterChanged { get; set; }
+    private bool isUserAuthenticated;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        isUserAuthenticated = user.Identity?.IsAuthenticated ?? false;
+    }
+
+    private async Task OnSearch()
+    {
+        if (OnFilterChanged.HasDelegate)
+        {
+            await OnFilterChanged.InvokeAsync(FilterCriteria);
+        }
+        else
+        {
+            Console.WriteLine("WARNING: OnFilterChanged has no delegate!");
+        }
+    }
+
+    private async Task OnReset()
+    {
+        FilterCriteria = new();
+        StateHasChanged(); 
+
+        if (OnFilterChanged.HasDelegate)
+        {
+            await OnFilterChanged.InvokeAsync(FilterCriteria);
+        }
+    }
+}
