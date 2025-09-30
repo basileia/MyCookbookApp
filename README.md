@@ -14,10 +14,9 @@ Includes authentication with a member section where users can manage only their 
 - Authentication & authorization (each user can edit/delete only their own recipes)  
 - Recipe management (create, update, delete, view)  
 - Member-only section  
-- Responsive UI  
+- Filtering (favorite / tried recipes)
 
 ## Planned Features
-- 🔎 Filtering (favorite / tried recipes)  
 - 🎲 Random meal plan generator (based on filters and preferences)
 
 ## Development Notes
