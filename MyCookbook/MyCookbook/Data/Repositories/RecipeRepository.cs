@@ -44,10 +44,28 @@ namespace MyCookbook.Data.Repositories
                 .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(filter.SearchText))
-                query = query.Where(r => r.Name.Contains(filter.SearchText, StringComparison.OrdinalIgnoreCase));
+            {
+                var text = filter.SearchText;
+                var pattern = $"%{text}%";
+
+                query = query.Where(r =>
+                    EF.Functions.ILike(
+                        EF.Functions.Unaccent(r.Name),
+                        EF.Functions.Unaccent(pattern)
+                    ));
+            }
 
             if (!string.IsNullOrWhiteSpace(filter.Ingredient))
-                query = query.Where(r => r.Ingredients.Any(ri => ri.Ingredient.Name.Contains(filter.Ingredient)));
+            {
+                var text = filter.Ingredient;
+                var pattern = $"%{text}%";
+
+                query = query.Where(r => r.Ingredients.Any(ri =>
+                    EF.Functions.ILike(
+                        EF.Functions.Unaccent(ri.Ingredient.NormalizedName ?? ri.Ingredient.Name),
+                        EF.Functions.Unaccent(pattern)
+                    )));
+            }
 
             if (!string.IsNullOrEmpty(userId))
             {
