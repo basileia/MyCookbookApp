@@ -1,0 +1,19 @@
+﻿@page "/mealplans"
+
+@rendermode InteractiveWebAssembly
+@inject NavigationManager NavigationManager
+
+<PageTitle>Jídelníčky - My Cookbook</PageTitle>
+
+<div class="page-header">
+    <h2>Jídelníčky</h2>
+</div>
+
+<button class="action-button primary" type="button" @onclick="GoToNewMealPlan">Nový jídelníček</button>
+
+@code {
+    private void GoToNewMealPlan()
+    {
+        NavigationManager.NavigateTo("/newmealplan");
+    }
+}
