@@ -12,7 +12,10 @@ namespace MyCookbook.Data
         public DbSet<RecipeIngredient> RecipeIngredients { get; set; }
         public DbSet<UserRecipeStatus> UserRecipeStatuses { get; set; }
         public DbSet<RecipeStep> RecipeSteps { get; set; }
-        
+        public DbSet<MealPlan> MealPlans { get; set; }
+        public DbSet<MealPlanDay> MealPlanDays { get; set; }
+        public DbSet<MealPlanRecipe> MealPlanRecipes { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -63,6 +66,33 @@ namespace MyCookbook.Data
             .WithMany(r => r.Steps)
             .HasForeignKey(rs => rs.RecipeId)
             .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<MealPlanRecipe>()
+            .HasKey(x => new { x.MealPlanDayId, x.RecipeId });
+
+            modelBuilder.Entity<MealPlan>()
+            .HasOne(mp => mp.User)
+            .WithMany() 
+            .HasForeignKey(mp => mp.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<MealPlanDay>()
+            .HasOne(d => d.MealPlan)
+            .WithMany(mp => mp.DaysPlan)
+            .HasForeignKey(d => d.MealPlanId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<MealPlanRecipe>()
+            .HasOne(mpr => mpr.MealPlanDay)
+            .WithMany(d => d.Recipes)
+            .HasForeignKey(mpr => mpr.MealPlanDayId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<MealPlanRecipe>()
+            .HasOne(mpr => mpr.Recipe)
+            .WithMany()
+            .HasForeignKey(mpr => mpr.RecipeId)
+            .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }
