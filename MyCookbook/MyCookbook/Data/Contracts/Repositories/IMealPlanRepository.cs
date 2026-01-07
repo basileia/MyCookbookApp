@@ -1,6 +1,10 @@
-﻿namespace MyCookbook.Data.Contracts.Repositories
+﻿using MyCookbook.Data.Models;
+
+namespace MyCookbook.Data.Contracts.Repositories
 {
-    public interface IMealPlanRepository
+    public interface IMealPlanRepository :IBaseRepository<MealPlan>
     {
+        Task<MealPlan?> GetWithDaysAndRecipesAsync(int id, string userId);
+        Task AddWithDaysAndRecipesAsync(MealPlan mealPlan);
     }
 }

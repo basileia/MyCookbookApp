@@ -1,0 +1,47 @@
+﻿@page "/mealplans/{MealPlanId:int}"
+
+@rendermode InteractiveWebAssembly
+@using MyCookbook.Shared.DTOs.MealPlanDTOs
+
+@inject HttpClient Http
+@inject NavigationManager Navigation
+
+<PageTitle>Detail jídelníčku - My Cookbook</PageTitle>
+
+<div class="page-header">
+    <h2>Detail jídelníčku</h2>
+</div>
+
+<div class="recipe-form-container">
+    @if (MealPlan == null && !loadError)
+    {
+        <p>Načítám jídelníček...</p>
+    }
+    else if (loadError)
+    {
+        <p class="alert-error">Chyba při načítání jídelníčku.</p>
+    }
+    else
+    {
+        <pre>@System.Text.Json.JsonSerializer.Serialize(MealPlan, new System.Text.Json.JsonSerializerOptions { WriteIndented = true })</pre>
+    }
+</div>
+
+@code {
+    [Parameter] public int MealPlanId { get; set; }
+
+    private MealPlanDetailDto? MealPlan { get; set; }
+    private bool loadError = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            MealPlan = await Http.GetFromJsonAsync<MealPlanDetailDto>($"/api/mealplans/{MealPlanId}");
+        }
+        catch
+        {
+            loadError = true;
+        }
+    }
+}

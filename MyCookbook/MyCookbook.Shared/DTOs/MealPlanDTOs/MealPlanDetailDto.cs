@@ -9,7 +9,8 @@
         public DayOfWeek StartDayOfWeek { get; set; }
 
         public DateTime CreatedAt { get; set; }
+        public string UserId { get; set; } = string.Empty;
 
-        public List<MealPlanDayDto> DaysPlan { get; set; } = new();
+        public List<MealPlanDayDto> DaysPlan { get; set; } = [];
     }
 }
