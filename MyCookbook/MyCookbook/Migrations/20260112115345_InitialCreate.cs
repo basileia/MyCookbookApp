@@ -72,7 +72,8 @@ namespace MyCookbook.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Name = table.Column<string>(type: "text", nullable: false)
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    NormalizedName = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -186,6 +187,29 @@ namespace MyCookbook.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "MealPlans",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    StartDayOfWeek = table.Column<int>(type: "integer", nullable: false),
+                    Days = table.Column<int>(type: "integer", nullable: false),
+                    UserId = table.Column<string>(type: "text", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MealPlans", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_MealPlans_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Recipes",
                 columns: table => new
                 {
@@ -205,6 +229,28 @@ namespace MyCookbook.Migrations
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "MealPlanDays",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    DayNumber = table.Column<int>(type: "integer", nullable: false),
+                    DayOfWeek = table.Column<int>(type: "integer", nullable: false),
+                    Notes = table.Column<string>(type: "text", nullable: true),
+                    MealPlanId = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MealPlanDays", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_MealPlanDays_MealPlans_MealPlanId",
+                        column: x => x.MealPlanId,
+                        principalTable: "MealPlans",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -304,6 +350,30 @@ namespace MyCookbook.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "MealPlanRecipes",
+                columns: table => new
+                {
+                    MealPlanDayId = table.Column<int>(type: "integer", nullable: false),
+                    RecipeId = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MealPlanRecipes", x => new { x.MealPlanDayId, x.RecipeId });
+                    table.ForeignKey(
+                        name: "FK_MealPlanRecipes_MealPlanDays_MealPlanDayId",
+                        column: x => x.MealPlanDayId,
+                        principalTable: "MealPlanDays",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_MealPlanRecipes_Recipes_RecipeId",
+                        column: x => x.RecipeId,
+                        principalTable: "Recipes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
             migrationBuilder.InsertData(
                 table: "Categories",
                 columns: new[] { "Id", "Name" },
@@ -358,6 +428,21 @@ namespace MyCookbook.Migrations
                 column: "RecipesId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_MealPlanDays_MealPlanId",
+                table: "MealPlanDays",
+                column: "MealPlanId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MealPlanRecipes_RecipeId",
+                table: "MealPlanRecipes",
+                column: "RecipeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MealPlans_UserId",
+                table: "MealPlans",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_RecipeIngredients_IngredientId",
                 table: "RecipeIngredients",
                 column: "IngredientId");
@@ -400,6 +485,9 @@ namespace MyCookbook.Migrations
                 name: "CategoryRecipe");
 
             migrationBuilder.DropTable(
+                name: "MealPlanRecipes");
+
+            migrationBuilder.DropTable(
                 name: "RecipeIngredients");
 
             migrationBuilder.DropTable(
@@ -415,10 +503,16 @@ namespace MyCookbook.Migrations
                 name: "Categories");
 
             migrationBuilder.DropTable(
+                name: "MealPlanDays");
+
+            migrationBuilder.DropTable(
                 name: "Ingredients");
 
             migrationBuilder.DropTable(
                 name: "Recipes");
+
+            migrationBuilder.DropTable(
+                name: "MealPlans");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");

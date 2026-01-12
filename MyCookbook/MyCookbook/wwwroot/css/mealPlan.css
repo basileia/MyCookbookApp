@@ -1,0 +1,17 @@
+﻿.mealplan-meta {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.95rem;
+}
+
+.mealplan-notes {
+    margin-top: 1rem;
+}
+
+.empty-notes,
+.empty-recipes {
+    font-style: italic;
+    color: #7f8c8d;
+}
+

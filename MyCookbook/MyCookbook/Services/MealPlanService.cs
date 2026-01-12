@@ -71,17 +71,19 @@ namespace MyCookbook.Services
                     .Where(r => !usedRecipeIds.Contains(r.Id) && r.Categories.Any(c => c.Id == categoryId))
                     .ToList();
 
+                    int? recipeId = null;
                     if (candidates.Any())
                     {
                         var recipe = PickRandom(candidates);
-
-                        day.Recipes.Add(new MealPlanRecipe
-                        {
-                            RecipeId = recipe.Id
-                        });
-
+                        recipeId = recipe.Id;
                         usedRecipeIds.Add(recipe.Id);
-                    }                    
+                    }
+
+                    day.Recipes.Add(new MealPlanRecipe
+                    {
+                        CategoryId = categoryId,
+                        RecipeId = recipeId
+                    });
                 }
             }
 

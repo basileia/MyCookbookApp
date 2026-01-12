@@ -22,6 +22,8 @@ namespace MyCookbook.Data.Repositories
                 .Where(mp => mp.Id == id && mp.UserId == userId)
                 .Include(mp => mp.DaysPlan)
                     .ThenInclude(d => d.Recipes)
+                        .ThenInclude(r => r.Recipe)
+                            .ThenInclude(r => r.Categories)
                 .FirstOrDefaultAsync();
         }
     }

@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MyCookbook.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250303161547_InitialCreate")]
+    [Migration("20260112115345_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -287,9 +287,87 @@ namespace MyCookbook.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("NormalizedName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.HasKey("Id");
 
                     b.ToTable("Ingredients");
+                });
+
+            modelBuilder.Entity("MyCookbook.Data.Models.MealPlan", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("Days")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("StartDayOfWeek")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("MealPlans");
+                });
+
+            modelBuilder.Entity("MyCookbook.Data.Models.MealPlanDay", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("DayNumber")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("DayOfWeek")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("MealPlanId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MealPlanId");
+
+                    b.ToTable("MealPlanDays");
+                });
+
+            modelBuilder.Entity("MyCookbook.Data.Models.MealPlanRecipe", b =>
+                {
+                    b.Property<int>("MealPlanDayId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("RecipeId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("MealPlanDayId", "RecipeId");
+
+                    b.HasIndex("RecipeId");
+
+                    b.ToTable("MealPlanRecipes");
                 });
 
             modelBuilder.Entity("MyCookbook.Data.Models.Recipe", b =>
@@ -456,6 +534,47 @@ namespace MyCookbook.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("MyCookbook.Data.Models.MealPlan", b =>
+                {
+                    b.HasOne("MyCookbook.Data.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("MyCookbook.Data.Models.MealPlanDay", b =>
+                {
+                    b.HasOne("MyCookbook.Data.Models.MealPlan", "MealPlan")
+                        .WithMany("DaysPlan")
+                        .HasForeignKey("MealPlanId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("MealPlan");
+                });
+
+            modelBuilder.Entity("MyCookbook.Data.Models.MealPlanRecipe", b =>
+                {
+                    b.HasOne("MyCookbook.Data.Models.MealPlanDay", "MealPlanDay")
+                        .WithMany("Recipes")
+                        .HasForeignKey("MealPlanDayId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("MyCookbook.Data.Models.Recipe", "Recipe")
+                        .WithMany()
+                        .HasForeignKey("RecipeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("MealPlanDay");
+
+                    b.Navigation("Recipe");
+                });
+
             modelBuilder.Entity("MyCookbook.Data.Models.Recipe", b =>
                 {
                     b.HasOne("MyCookbook.Data.ApplicationUser", "User")
@@ -514,6 +633,16 @@ namespace MyCookbook.Migrations
                     b.Navigation("Ingredient");
 
                     b.Navigation("Recipe");
+                });
+
+            modelBuilder.Entity("MyCookbook.Data.Models.MealPlan", b =>
+                {
+                    b.Navigation("DaysPlan");
+                });
+
+            modelBuilder.Entity("MyCookbook.Data.Models.MealPlanDay", b =>
+                {
+                    b.Navigation("Recipes");
                 });
 
             modelBuilder.Entity("MyCookbook.Data.Models.Recipe", b =>

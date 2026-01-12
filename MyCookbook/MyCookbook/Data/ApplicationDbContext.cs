@@ -68,7 +68,7 @@ namespace MyCookbook.Data
             .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<MealPlanRecipe>()
-            .HasKey(x => new { x.MealPlanDayId, x.RecipeId });
+            .HasKey(x => new { x.MealPlanDayId, x.CategoryId });
 
             modelBuilder.Entity<MealPlan>()
             .HasOne(mp => mp.User)
@@ -92,6 +92,12 @@ namespace MyCookbook.Data
             .HasOne(mpr => mpr.Recipe)
             .WithMany()
             .HasForeignKey(mpr => mpr.RecipeId)
+            .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<MealPlanRecipe>()
+            .HasOne(mpr => mpr.Category)
+            .WithMany()
+            .HasForeignKey(mpr => mpr.CategoryId)
             .OnDelete(DeleteBehavior.Restrict);
         }
     }

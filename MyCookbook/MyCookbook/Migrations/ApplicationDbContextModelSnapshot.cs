@@ -357,10 +357,15 @@ namespace MyCookbook.Migrations
                     b.Property<int>("MealPlanDayId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("RecipeId")
+                    b.Property<int>("CategoryId")
                         .HasColumnType("integer");
 
-                    b.HasKey("MealPlanDayId", "RecipeId");
+                    b.Property<int?>("RecipeId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("MealPlanDayId", "CategoryId");
+
+                    b.HasIndex("CategoryId");
 
                     b.HasIndex("RecipeId");
 
@@ -555,6 +560,12 @@ namespace MyCookbook.Migrations
 
             modelBuilder.Entity("MyCookbook.Data.Models.MealPlanRecipe", b =>
                 {
+                    b.HasOne("MyCookbook.Data.Models.Category", "Category")
+                        .WithMany()
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("MyCookbook.Data.Models.MealPlanDay", "MealPlanDay")
                         .WithMany("Recipes")
                         .HasForeignKey("MealPlanDayId")
@@ -564,8 +575,9 @@ namespace MyCookbook.Migrations
                     b.HasOne("MyCookbook.Data.Models.Recipe", "Recipe")
                         .WithMany()
                         .HasForeignKey("RecipeId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Category");
 
                     b.Navigation("MealPlanDay");
 

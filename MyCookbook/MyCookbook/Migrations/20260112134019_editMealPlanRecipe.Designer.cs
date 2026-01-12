@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MyCookbook.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260106090618_AddMealPlans")]
-    partial class AddMealPlans
+    [Migration("20260112134019_editMealPlanRecipe")]
+    partial class editMealPlanRecipe
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -360,10 +360,15 @@ namespace MyCookbook.Migrations
                     b.Property<int>("MealPlanDayId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("RecipeId")
+                    b.Property<int>("CategoryId")
                         .HasColumnType("integer");
 
-                    b.HasKey("MealPlanDayId", "RecipeId");
+                    b.Property<int?>("RecipeId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("MealPlanDayId", "CategoryId");
+
+                    b.HasIndex("CategoryId");
 
                     b.HasIndex("RecipeId");
 
@@ -558,6 +563,12 @@ namespace MyCookbook.Migrations
 
             modelBuilder.Entity("MyCookbook.Data.Models.MealPlanRecipe", b =>
                 {
+                    b.HasOne("MyCookbook.Data.Models.Category", "Category")
+                        .WithMany()
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("MyCookbook.Data.Models.MealPlanDay", "MealPlanDay")
                         .WithMany("Recipes")
                         .HasForeignKey("MealPlanDayId")
@@ -567,8 +578,9 @@ namespace MyCookbook.Migrations
                     b.HasOne("MyCookbook.Data.Models.Recipe", "Recipe")
                         .WithMany()
                         .HasForeignKey("RecipeId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Category");
 
                     b.Navigation("MealPlanDay");
 
