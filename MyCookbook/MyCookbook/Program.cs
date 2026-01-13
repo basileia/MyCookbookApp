@@ -40,6 +40,8 @@ builder.Services.AddScoped<IRecipeIngredientService, RecipeIngredientService>();
 builder.Services.AddScoped<IRecipeStepRepository, RecipeStepRepository>();
 builder.Services.AddScoped<IUserRecipeStatusService, UserRecipeStatusService>();
 builder.Services.AddScoped<IUserRecipeStatusRepository, UserRecipeStatusRepository>();
+builder.Services.AddScoped<IMealPlanRepository, MealPlanRepository>();
+builder.Services.AddScoped<IMealPlanService, MealPlanService>();
 
 builder.Services.AddAuthorization();
 builder.Services.AddAuthentication(options =>

@@ -1,0 +1,49 @@
+﻿.category-badge {
+    min-width: 90px;
+    text-align: center;
+    padding: 0.35rem 0.6rem;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    background-color: #f7b731;
+    color: #fff;
+    flex-shrink: 0;
+}
+
+.mealplan-recipe-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background-color: #fff;
+    padding: 0.65rem 0.75rem;
+    border-radius: 6px;
+    margin-bottom: 0.5rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+    .mealplan-recipe-row:hover {
+        background-color: rgba(247, 183, 49, 0.08);
+    }
+
+.recipe-detail-card a.recipe-name {
+    color: #2c3e50;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+    .recipe-detail-card a.recipe-name:hover{
+        text-decoration: underline;
+    }
+
+.recipe-missing {
+    color: #7f8c8d;
+    font-style: italic;
+    font-size: 0.9rem;
+}
+
+.mealplan-day {
+    margin-bottom: 2rem;
+    padding: 1.25rem;
+    background-color: #fafafa;
+    border-radius: 10px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}

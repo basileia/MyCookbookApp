@@ -1,0 +1,98 @@
+﻿@page "/mealplans"
+@using MyCookbook.Shared
+@using MyCookbook.Shared.DTOs.MealPlanDTOs
+
+@rendermode InteractiveWebAssembly
+@inject NavigationManager NavigationManager
+@inject HttpClient Http
+
+<PageTitle>Jídelníčky - My Cookbook</PageTitle>
+
+<div class="page-header">
+    <h2>Moje jídelníčky</h2>
+</div>
+
+<div class="recipe-form-container">
+    <button class="action-button primary" type="button" @onclick="GoToNewMealPlan">Nový jídelníček</button>
+
+    @if (mealPlans == null)
+    {
+        <div class="recipe-loading">
+            <i class="bi bi-clock"></i>
+            Načítám jídelníčky...
+        </div>
+    }
+    else if (mealPlans.Count == 0)
+    {
+        <p class="empty-recipes">Zatím nemáš žádný jídelníček.</p>
+    }
+    else
+    {
+        <div class="mealplan-list mt-3">
+            @foreach (var plan in mealPlans)
+            {
+                <div class="mealplan-card"
+                     @onclick="() => OpenDetail(plan.Id)">
+
+                    <div class="mealplan-card-header">
+                        <h3>@plan.Name</h3>
+
+                        <button class="icon-button mealplan-menu"
+                                @onclick:stopPropagation="true">
+                            <i class="bi bi-three-dots-vertical"></i>
+                        </button>
+                    </div>
+
+                    <div class="mealplan-card-meta">
+                        <span>
+                            @DayOfWeekExtensions.CzechNames[plan.StartDayOfWeek]
+                            –
+                            @DayOfWeekExtensions.CzechNames[
+                            (DayOfWeek)(((int)plan.StartDayOfWeek + plan.Days - 1) % 7)
+                                        ]
+                        </span>
+                        <span>· @plan.Days @plan.Days.CzechDays()</span>
+                    </div>
+
+            <div class="mealplan-card-date">
+                Vytvořeno: @plan.CreatedAt.ToLocalTime().ToShortDateString()
+            </div>
+
+                </div>
+                }
+        </div>
+    }
+</div>
+
+@code {
+    private List<MealPlanListDto> mealPlans = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var response = await Http.GetAsync("api/mealplans");
+
+            if (response.IsSuccessStatusCode)
+            {
+                mealPlans = await response.Content.ReadFromJsonAsync<List<MealPlanListDto>>()
+                    ?? new List<MealPlanListDto>();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Exception: {ex.Message}");
+        }
+    }
+
+
+    private void GoToNewMealPlan()
+    {
+        NavigationManager.NavigateTo("/newmealplan");
+    }
+
+    private void OpenDetail(int id)
+    {
+        NavigationManager.NavigateTo($"/mealplans/{id}");
+    }
+}

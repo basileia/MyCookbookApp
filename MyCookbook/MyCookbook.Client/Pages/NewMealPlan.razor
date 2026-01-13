@@ -1,0 +1,106 @@
+﻿@page "/newmealplan"
+
+@rendermode InteractiveWebAssembly
+@using MyCookbook.Shared
+@using MyCookbook.Shared.DTOs.MealPlanDTOs
+
+@inject HttpClient Http
+@inject NavigationManager Navigation
+@inject IJSRuntime JS
+
+<PageTitle>Nový jídelníček - My Cookbook</PageTitle>
+
+<div class="page-header">
+    <h2>Nový jídelníček</h2>
+</div>
+
+<div class="recipe-form-container">
+    <EditForm Model="MealPlanModel" OnValidSubmit="GenerateMealPlan">
+        <DataAnnotationsValidator />
+        <ValidationSummary/>
+
+        <div class="form-section">
+            <div class="mb-3">
+                <label>Název jídelníčku</label>
+                <InputText class="input-control" @bind-Value="MealPlanModel.Name" />
+                <ValidationMessage For="@(() => MealPlanModel.Name)" />
+            </div>
+
+            <div class="mb-3">
+                <label>Počet dní (1–7)</label>
+                <InputNumber class="input-control" @bind-Value="MealPlanModel.Days" />
+                <ValidationMessage For="@(() => MealPlanModel.Days)" />
+            </div>
+
+            <div class="mb-3">
+                <label>Startovní den</label>
+                <InputSelect class="input-control" @bind-Value="MealPlanModel.StartDayOfWeek">
+                    @foreach (var day in new[] {
+                                        DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday,
+                                        DayOfWeek.Thursday, DayOfWeek.Friday, DayOfWeek.Saturday, DayOfWeek.Sunday })
+                    {
+                        <option value="@day">@DayOfWeekExtensions.CzechNames[day]</option>
+                    }
+                </InputSelect>
+                <ValidationMessage For="@(() => MealPlanModel.StartDayOfWeek)" />
+            </div>
+
+            <div class="category-grid">
+                <label class="category-checkbox">
+                    <InputCheckbox @bind-Value="MealPlanModel.FilterMine" /> Moje
+                </label>
+                <label class="category-checkbox">
+                    <InputCheckbox @bind-Value="MealPlanModel.FilterTried" /> Vyzkoušené
+                </label>
+                <label class="category-checkbox">
+                    <InputCheckbox @bind-Value="MealPlanModel.FilterFavorites" /> Oblíbené
+                </label>
+            </div>
+            <div class="form-actions">
+                <button class="action-button primary" type="submit">Generovat jídelníček</button>
+                <button class="action-button secondary" type="button" @onclick="ResetForm">Reset</button>
+            </div>
+        </div>  
+    </EditForm>
+</div>
+
+@code {
+    private NewMealPlanDto MealPlanModel { get; set; } = new();
+
+    private void ResetForm()
+    {
+        MealPlanModel = new();
+    }
+
+    private async Task GenerateMealPlan()
+    {
+        try
+        {
+            var response = await Http.PostAsJsonAsync("/api/mealplans", MealPlanModel);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var createdMealPlan = await response.Content.ReadFromJsonAsync<MealPlanDetailDto>();
+
+                if (createdMealPlan != null)
+                {
+                    Navigation.NavigateTo($"/mealplans/{createdMealPlan.Id}");
+                }
+            }
+            else
+            {
+                var errorText = await response.Content.ReadAsStringAsync();
+                await JS.InvokeVoidAsync("alert", $"Chyba při vytváření jídelníčku: {errorText}");
+            }
+        }
+        catch (Exception ex)
+        {
+            await JS.InvokeVoidAsync("alert", $"Chyba při volání serveru: {ex.Message}");
+        }
+    }
+
+    private void Cancel()
+    {
+        Navigation.NavigateTo("/mealplans");
+    }    
+}

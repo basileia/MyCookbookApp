@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MyCookbook.Data.Contracts.Services;
-using MyCookbook.Data.Models;
 using MyCookbook.Shared.DTOs.IngredientDTOs;
 
 namespace MyCookbook.Controllers

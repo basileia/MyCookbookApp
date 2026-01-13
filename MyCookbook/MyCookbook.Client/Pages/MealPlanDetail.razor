@@ -1,0 +1,105 @@
+﻿@page "/mealplans/{MealPlanId:int}"
+
+@rendermode InteractiveWebAssembly
+@using MyCookbook.Shared
+@using MyCookbook.Shared.DTOs.CategoryDTOs
+@using MyCookbook.Shared.DTOs.MealPlanDTOs
+
+@inject HttpClient Http
+@inject NavigationManager Navigation
+
+<PageTitle>Detail jídelníčku - My Cookbook</PageTitle>
+
+<div class="page-header">
+    <h2>@(mealPlan?.Name ?? "Jídelníček")</h2>
+</div>
+
+<div class="recipe-form-container recipe-detail">
+    @if (mealPlan == null)
+    {
+        <div class="recipe-loading">
+            <i class="bi bi-clock"></i>
+            Načítám jídelníček...
+        </div>
+    }
+    else
+    {
+        <div class="recipe-detail-card">
+
+            <div class="mealplan-meta">
+                <div><strong>Počet dní:</strong> @mealPlan.Days</div>
+                <div><strong>Začíná:</strong> @DayOfWeekExtensions.CzechNames[mealPlan.StartDayOfWeek]</div>
+                <div><strong>Vytvořeno:</strong> @mealPlan.CreatedAt.ToLocalTime().ToShortDateString()</div>
+            </div>
+
+            @foreach (var day in mealPlan.DaysPlan.OrderBy(d => d.DayNumber))
+            {
+                <div class="mealplan-day mt-3">
+                    <h3>
+                        Den @day.DayNumber –
+                        @DayOfWeekExtensions.CzechNames[day.DayOfWeek]
+                    </h3>
+
+                    <div class="mealplan-recipes">
+                        @if (day.Recipes == null || !day.Recipes.Any())
+                        {
+                            <p class="empty-recipes">Žádné recepty</p>
+                        }
+                        else
+                        {
+                            @foreach (var slot in day.Recipes)
+                            {
+                                <div class="mealplan-recipe-row">
+                                    <span class="category-badge">@slot.CategoryName</span>
+
+                                    @if (slot.RecipeId == null)
+                                    {
+                                        <em class="recipe-missing">Recept není k dispozici</em>
+                                    }
+                                    else
+                                    {
+                                        <a href="@($"/recipe/{slot.RecipeId}")" class="recipe-name">@slot.RecipeName</a>
+                                    }
+                                </div>
+                            }
+                        }
+                    </div>
+
+                    <div class="mealplan-notes">
+                        <h5>Poznámky</h5>
+                        @if (string.IsNullOrWhiteSpace(day.Notes))
+                        {
+                            <p class="empty-notes">Žádné poznámky</p>
+                        }
+                        else
+                        {
+                            <p>@day.Notes</p>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+
+@code {
+    [Parameter] public int MealPlanId { get; set; }
+
+    private MealPlanDetailDto? mealPlan { get; set; }
+    private List<CategoryDto> categories = new List<CategoryDto>();
+    private bool loadError = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            mealPlan = await Http.GetFromJsonAsync<MealPlanDetailDto>($"/api/mealplans/{MealPlanId}");
+            categories = await Http.GetFromJsonAsync<List<CategoryDto>>("/api/category/getallcategories") ?? new List<CategoryDto>();
+        }
+        catch
+        {
+            loadError = true;
+        }
+    }
+}
