@@ -40,5 +40,13 @@ namespace MyCookbook.Controllers
             var result = await _mealPlanService.GetMealPlanByIdAsync(userId, id);
             return GetResponse(result);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAllMealPlans()
+        {
+            var userId = GetUserId();
+            var result = await _mealPlanService.GetAllMealPlansAsync(userId);
+            return GetResponse(result);
+        }
     }
 }

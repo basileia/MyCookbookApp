@@ -113,6 +113,18 @@ namespace MyCookbook.Services
             var index = Random.Shared.Next(recipes.Count);
             return recipes[index];
         }
+
+        public async Task<Result<List<MealPlanListDto>, Error>> GetAllMealPlansAsync(string userId)
+        {
+            if (string.IsNullOrEmpty(userId))
+            {
+                return UserError.Unauthorized;
+            }
+
+            var mealPlans = await _mealPlanRepository.GetAllByUserIdAsync(userId);
+            var mealPlanListDtos = _mapper.Map<List<MealPlanListDto>>(mealPlans);
+            return mealPlanListDtos;
+        }
     } 
 
         /* Editace poznámek, nahrazení receptů

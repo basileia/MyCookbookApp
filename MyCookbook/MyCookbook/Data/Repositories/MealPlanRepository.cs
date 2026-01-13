@@ -26,5 +26,12 @@ namespace MyCookbook.Data.Repositories
                             .ThenInclude(r => r.Categories)
                 .FirstOrDefaultAsync();
         }
+
+        public async Task<List<MealPlan>> GetAllByUserIdAsync(string userId)
+        {
+            return await _context.MealPlans
+                .Where(mp => mp.UserId == userId)
+                .ToListAsync();
+        }
     }
 }

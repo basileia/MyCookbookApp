@@ -11,6 +11,7 @@ namespace MyCookbook.Extensions
             CreateMap<MealPlan, MealPlanDetailDto>();
             CreateMap<MealPlanDay, MealPlanDayDto>();
             CreateMap<MealPlanRecipe, MealPlanRecipeDto>();
+            CreateMap<MealPlan, MealPlanListDto>();
         }
     }
 }

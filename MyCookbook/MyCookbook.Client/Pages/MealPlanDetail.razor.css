@@ -30,7 +30,7 @@
     font-weight: 500;
 }
 
-    .recipe-detail-card a.recipe-name:hover {
+    .recipe-detail-card a.recipe-name:hover{
         text-decoration: underline;
     }
 

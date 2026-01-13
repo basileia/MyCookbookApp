@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MyCookbook.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260112134019_editMealPlanRecipe")]
-    partial class editMealPlanRecipe
+    [Migration("20260113125827_AddMealPlans")]
+    partial class AddMealPlans
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

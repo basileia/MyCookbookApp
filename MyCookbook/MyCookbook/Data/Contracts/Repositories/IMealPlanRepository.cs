@@ -6,5 +6,6 @@ namespace MyCookbook.Data.Contracts.Repositories
     {
         Task<MealPlan?> GetWithDaysAndRecipesAsync(int id, string userId);
         Task AddWithDaysAndRecipesAsync(MealPlan mealPlan);
+        Task<List<MealPlan>> GetAllByUserIdAsync(string userId);
     }
 }
