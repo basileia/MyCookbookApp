@@ -5,6 +5,7 @@
 @rendermode InteractiveWebAssembly
 @inject NavigationManager NavigationManager
 @inject HttpClient Http
+@inject IJSRuntime JS
 
 <PageTitle>Jídelníčky - My Cookbook</PageTitle>
 
@@ -37,10 +38,27 @@
                     <div class="mealplan-card-header">
                         <h3>@plan.Name</h3>
 
-                        <button class="icon-button mealplan-menu"
-                                @onclick:stopPropagation="true">
-                            <i class="bi bi-three-dots-vertical"></i>
-                        </button>
+                        <div>
+                            <button class="icon-button"
+                                    title="Přejmenovat"
+                                    @onclick:stopPropagation="true">
+                                <i class="fa-solid fa-pen icon"></i>
+                            </button>
+
+                            <button class="icon-button"
+                                    title="Duplikovat"
+                                    @onclick:stopPropagation="true">
+                                <i class="fa-solid fa-copy icon"></i>
+                            </button>
+
+                            <button class="icon-button danger"
+                                    title="Smazat"
+                                    @onclick:stopPropagation="true"
+                                    @onclick="() => ConfirmDelete(plan.Id)">
+                                <i class="fa-solid fa-trash icon"></i>
+                            </button>
+                        </div>
+
                     </div>
 
                     <div class="mealplan-card-meta">
@@ -94,5 +112,18 @@
     private void OpenDetail(int id)
     {
         NavigationManager.NavigateTo($"/mealplans/{id}");
+    }    
+
+    private async Task ConfirmDelete(int id)
+    {
+        var confirmed = await JS.InvokeAsync<bool>(
+            "confirm",
+            "Opravdu chceš tento jídelníček smazat?"
+        );
+
+        if (!confirmed)
+            return;
+
+        //await DeleteMealPlan(id);
     }
 }
