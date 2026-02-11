@@ -48,5 +48,19 @@ namespace MyCookbook.Controllers
             var result = await _mealPlanService.GetAllMealPlansAsync(userId);
             return GetResponse(result);
         }
+
+        [Authorize]
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteMealPlan(int id)
+        {
+            var userId = GetUserId();
+
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized("Uživatel není přihlášen.");
+
+            var result = await _mealPlanService.DeleteMealPlanAsync(id, userId);
+
+            return GetResponse(result);
+        }
     }
 }

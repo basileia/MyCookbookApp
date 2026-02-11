@@ -124,6 +124,32 @@
         if (!confirmed)
             return;
 
-        //await DeleteMealPlan(id);
+        await DeleteMealPlan(id);
+    }
+
+    private async Task DeleteMealPlan(int id)
+    {
+        try 
+        {
+            var response = await Http.DeleteAsync($"/api/mealplans/{id}");
+
+            if (response.IsSuccessStatusCode)
+            {
+                var plan = mealPlans.FirstOrDefault(p => p.Id == id);
+
+                if (plan != null)
+                    mealPlans.Remove(plan);
+
+                StateHasChanged();
+            }
+            else
+            {
+                Console.WriteLine("Došlo k chybě při mazání.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Exception: {ex.Message}");
+        }
     }
 }
