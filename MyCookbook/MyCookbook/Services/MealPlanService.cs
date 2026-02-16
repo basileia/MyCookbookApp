@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using LanguageExt;
 using MyCookbook.Data.Contracts.Repositories;
 using MyCookbook.Data.Contracts.Services;
 using MyCookbook.Data.Models;
@@ -61,7 +62,7 @@ namespace MyCookbook.Services
             }
 
             var categories = new[] { 1, 2, 3, 4 };
-            var usedRecipeIds = new HashSet<int>();
+            var usedRecipeIds = new System.Collections.Generic.HashSet<int>();
 
             foreach (var day in mealPlan.DaysPlan)
             {
@@ -125,8 +126,22 @@ namespace MyCookbook.Services
             var mealPlanListDtos = _mapper.Map<List<MealPlanListDto>>(mealPlans);
             return mealPlanListDtos;
         }
+
+        public async Task<Result<Unit, Error>> DeleteMealPlanAsync(string userId, int mealPlanId)
+        {
+            var mealPlan = await _mealPlanRepository
+                .GetByIdAsync(mealPlanId, userId);
+
+            if (mealPlan == null)
+            {
+                return MealPlanError.MealPlanNotFound;
+            }
+
+            await _mealPlanRepository.DeleteAsync(mealPlan);
+
+            return Unit.Default;
+        }
     } 
 
-        /* Editace poznámek, nahrazení receptů
-            Zajištění, že jídelníčky patří jen danému uživateli*/
+        
 }

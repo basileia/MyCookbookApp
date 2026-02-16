@@ -58,7 +58,7 @@ namespace MyCookbook.Controllers
             if (string.IsNullOrEmpty(userId))
                 return Unauthorized("Uživatel není přihlášen.");
 
-            var result = await _mealPlanService.DeleteMealPlanAsync(id, userId);
+            var result = await _mealPlanService.DeleteMealPlanAsync(userId, id);
 
             return GetResponse(result);
         }

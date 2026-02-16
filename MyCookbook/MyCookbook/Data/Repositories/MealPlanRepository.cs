@@ -33,5 +33,13 @@ namespace MyCookbook.Data.Repositories
                 .Where(mp => mp.UserId == userId)
                 .ToListAsync();
         }
+
+        public async Task<MealPlan?> GetByIdAsync(int id, string userId)
+        {
+            return await _context.MealPlans
+                .FirstOrDefaultAsync(mp =>
+                    mp.Id == id &&
+                    mp.UserId == userId);
+        }
     }
 }

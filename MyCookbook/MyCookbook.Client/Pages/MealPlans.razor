@@ -13,6 +13,13 @@
     <h2>Moje jídelníčky</h2>
 </div>
 
+@if (!string.IsNullOrWhiteSpace(errorMessage))
+{
+    <div class="alert alert-danger">
+        @errorMessage
+    </div>
+}
+
 <div class="recipe-form-container">
     <button class="action-button primary" type="button" @onclick="GoToNewMealPlan">Nový jídelníček</button>
 
@@ -84,6 +91,7 @@
 
 @code {
     private List<MealPlanListDto> mealPlans = new();
+    private string? errorMessage;
 
     protected override async Task OnInitializedAsync()
     {
@@ -129,27 +137,32 @@
 
     private async Task DeleteMealPlan(int id)
     {
+        errorMessage = null;
+
         try 
         {
-            var response = await Http.DeleteAsync($"/api/mealplans/{id}");
+            var response = await Http.DeleteAsync($"api/mealplans/{id}");
 
             if (response.IsSuccessStatusCode)
             {
                 var plan = mealPlans.FirstOrDefault(p => p.Id == id);
 
                 if (plan != null)
-                    mealPlans.Remove(plan);
-
-                StateHasChanged();
+                    mealPlans.Remove(plan);                
             }
             else
             {
-                Console.WriteLine("Došlo k chybě při mazání.");
+                var serverMessage = await response.Content.ReadAsStringAsync();
+
+                errorMessage = string.IsNullOrWhiteSpace(serverMessage)
+                    ? "Nepodařilo se smazat jídelníček."
+                    : serverMessage;
             }
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Exception: {ex.Message}");
+            errorMessage = ex.Message;
         }
+        StateHasChanged();
     }
 }

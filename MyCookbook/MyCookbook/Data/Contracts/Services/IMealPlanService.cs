@@ -1,4 +1,5 @@
-﻿using MyCookbook.Results;
+﻿using LanguageExt;
+using MyCookbook.Results;
 using MyCookbook.Shared.DTOs.MealPlanDTOs;
 
 namespace MyCookbook.Data.Contracts.Services
@@ -8,5 +9,6 @@ namespace MyCookbook.Data.Contracts.Services
         Task<Result<MealPlanDetailDto, Error>> CreateMealPlanAsync(string userId, NewMealPlanDto newMealPlanDto);
         Task<Result<MealPlanDetailDto, Error>> GetMealPlanByIdAsync(string userId, int mealPlanId);
         Task<Result<List<MealPlanListDto>, Error>> GetAllMealPlansAsync(string userId);
+        Task<Result<Unit, Error>> DeleteMealPlanAsync(string userId, int mealPlanId);
     }
 }
