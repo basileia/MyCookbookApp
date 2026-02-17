@@ -54,7 +54,8 @@
 
                             <button class="icon-button"
                                     title="Duplikovat"
-                                    @onclick:stopPropagation="true">
+                                    @onclick:stopPropagation="true"
+                                    @onclick="() => DuplicateMealPlan(plan.Id)">
                                 <i class="fa-solid fa-copy icon"></i>
                             </button>
 
@@ -159,6 +160,36 @@
                     : serverMessage;
             }
         }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+        StateHasChanged();
+    }
+
+    private async Task DuplicateMealPlan(int id)
+    {
+        errorMessage = null;
+
+        try
+        {
+            var response = await Http.PostAsync($"api/mealplans/{id}/duplicate", null);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var newPlan = await response.Content.ReadFromJsonAsync<MealPlanListDto>();
+
+                if (newPlan != null)
+                    mealPlans.Add(newPlan);
+            }
+            else
+            {
+                var message = await response.Content.ReadAsStringAsync();
+                errorMessage = string.IsNullOrWhiteSpace(message)
+                    ? "Nepodařilo se duplikovat jídelníček."
+                    : message;
+            }
+        } 
         catch (Exception ex)
         {
             errorMessage = ex.Message;

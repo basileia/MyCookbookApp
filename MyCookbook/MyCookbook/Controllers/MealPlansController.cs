@@ -62,5 +62,18 @@ namespace MyCookbook.Controllers
 
             return GetResponse(result);
         }
+
+        [Authorize]
+        [HttpPost("{id}/duplicate")]
+        public async Task<IActionResult> Duplicate(int id)
+        {
+            var userId = GetUserId();
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized("Uživatel není přihlášen.");
+
+            var result = await _mealPlanService.DuplicateMealPlanAsync(userId, id);
+
+            return GetResponse(result);
+        }
     }
 }

@@ -1,10 +1,12 @@
 ﻿using AutoMapper;
 using LanguageExt;
+using MyCookbook.Client.Pages;
 using MyCookbook.Data.Contracts.Repositories;
 using MyCookbook.Data.Contracts.Services;
 using MyCookbook.Data.Models;
 using MyCookbook.Results;
 using MyCookbook.Results.Errors;
+using MyCookbook.Services.Helpers;
 using MyCookbook.Shared.DTOs;
 using MyCookbook.Shared.DTOs.MealPlanDTOs;
 
@@ -140,6 +142,47 @@ namespace MyCookbook.Services
             await _mealPlanRepository.DeleteAsync(mealPlan);
 
             return Unit.Default;
+        }
+
+        public async Task<Result<MealPlanDetailDto, Error>> DuplicateMealPlanAsync(string userId, int mealPlanId)
+        {
+            if (string.IsNullOrEmpty(userId))
+                return UserError.Unauthorized;
+
+            var original = await _mealPlanRepository.GetWithDaysAndRecipesAsync(mealPlanId, userId);
+
+            if (original == null)
+                return MealPlanError.MealPlanNotFound;
+
+            var allUserPlans = await _mealPlanRepository.GetAllByUserIdAsync(userId);
+            var existingNames = allUserPlans.Select(p => p.Name).ToList();
+
+            var newName = MealPlanNamingHelper.GetNextCopyName(original.Name, existingNames);
+
+            var copy = new MealPlan
+            {
+                Name = newName,
+                StartDayOfWeek = original.StartDayOfWeek,
+                Days = original.Days,
+                UserId = userId,
+                CreatedAt = DateTime.UtcNow,
+                DaysPlan = original.DaysPlan.Select(d => new MealPlanDay
+                {
+                    DayNumber = d.DayNumber,
+                    DayOfWeek = d.DayOfWeek,
+                    Recipes = d.Recipes.Select(r => new MealPlanRecipe
+                    {
+                        CategoryId = r.CategoryId,
+                        RecipeId = r.RecipeId
+                    }).ToList()
+                }).ToList()
+            };
+
+            await _mealPlanRepository.AddWithDaysAndRecipesAsync(copy);
+
+            var copyDto = _mapper.Map<MealPlanDetailDto>(copy);
+
+            return copyDto;
         }
     } 
 
