@@ -92,7 +92,7 @@
 
 @code {
     private List<MealPlanListDto> mealPlans = new();
-    private string? errorMessage;
+    private string errorMessage = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
@@ -138,7 +138,7 @@
 
     private async Task DeleteMealPlan(int id)
     {
-        errorMessage = null;
+        errorMessage = string.Empty;
 
         try 
         {
@@ -169,7 +169,7 @@
 
     private async Task DuplicateMealPlan(int id)
     {
-        errorMessage = null;
+        errorMessage = string.Empty;
 
         try
         {

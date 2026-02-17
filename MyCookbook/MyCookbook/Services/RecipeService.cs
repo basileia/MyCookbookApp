@@ -53,7 +53,7 @@ namespace MyCookbook.Services
 
         public async Task<Result<RecipeDetailDto, Error>> AddNewRecipeAsync(CreateRecipeDto createRecipeDto, string userId)
         {
-            var existing = await _recipeRepository.GetByNameAsync(createRecipeDto.Name);
+            var existing = await _recipeRepository.GetByNameAsync(createRecipeDto.Name.Trim());
             if (existing is not null)
             {
                 return RecipeError.DuplicateName;

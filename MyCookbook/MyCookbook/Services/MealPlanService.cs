@@ -32,6 +32,10 @@ namespace MyCookbook.Services
                 return UserError.Unauthorized;
             }
 
+            var existing = await _mealPlanRepository.GetByNameAsync(newMealPlanDto.Name.Trim(), userId);
+            if (existing != null)
+                return MealPlanError.DuplicateName;
+
             var filter = new FilterCriteriaDto
             {
                 Favorites = newMealPlanDto.FilterFavorites,
