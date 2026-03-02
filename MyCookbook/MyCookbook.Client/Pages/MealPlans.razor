@@ -48,7 +48,8 @@
                         <div>
                             <button class="icon-button"
                                     title="Přejmenovat"
-                                    @onclick:stopPropagation="true">
+                                    @onclick:stopPropagation="true"
+                                    @onclick="() => RenameMealPlan(plan)">
                                 <i class="fa-solid fa-pen icon"></i>
                             </button>
 

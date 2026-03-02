@@ -11,5 +11,6 @@ namespace MyCookbook.Data.Contracts.Services
         Task<Result<List<MealPlanListDto>, Error>> GetAllMealPlansAsync(string userId);
         Task<Result<Unit, Error>> DeleteMealPlanAsync(string userId, int mealPlanId);
         Task<Result<MealPlanDetailDto, Error>> DuplicateMealPlanAsync(string userId, int mealPlanId);
+        Task<Result<Unit, Error>> RenameMealPlanAsync(int id, string newName, string userId);
     }
 }

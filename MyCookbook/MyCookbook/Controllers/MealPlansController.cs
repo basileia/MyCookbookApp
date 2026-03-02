@@ -33,6 +33,19 @@ namespace MyCookbook.Controllers
             );
         }
 
+        [Authorize]
+        [HttpPut("{id}/rename")]
+        public async Task<IActionResult> Rename(int id, RenameMealPlanDto renameMealPlanDto)
+        {
+            var userId = GetUserId();
+
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized("Uživatel není přihlášen.");
+
+            var result = await _mealPlanService.RenameMealPlanAsync(id, renameMealPlanDto.Name, userId);
+            return GetResponse(result);                
+        }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetMealPlanById(int id)
         {

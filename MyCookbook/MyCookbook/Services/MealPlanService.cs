@@ -42,9 +42,10 @@ namespace MyCookbook.Services
                 Tried = newMealPlanDto.FilterTried,
                 Mine = newMealPlanDto.FilterMine
             };
-            var filteredRecipes = await _recipeRepository.GetFilteredAsync(filter, userId);                      
+            var filteredRecipes = await _recipeRepository.GetFilteredAsync(filter, userId);
 
-            var mealPlan = new MealPlan { 
+            var mealPlan = new MealPlan
+            {
                 CreatedAt = DateTime.UtcNow,
                 Days = newMealPlanDto.Days,
                 Name = newMealPlanDto.Name,
@@ -94,7 +95,7 @@ namespace MyCookbook.Services
                 }
             }
 
-             await _mealPlanRepository.AddWithDaysAndRecipesAsync(mealPlan);
+            await _mealPlanRepository.AddWithDaysAndRecipesAsync(mealPlan);
 
             var mealPlanDetailDto = _mapper.Map<MealPlanDetailDto>(mealPlan);
             return mealPlanDetailDto;
@@ -188,7 +189,25 @@ namespace MyCookbook.Services
 
             return copyDto;
         }
-    } 
 
-        
+        public async Task<Result<Unit, Error>> RenameMealPlanAsync(int id, string newName, string userId)
+        {
+            if (string.IsNullOrEmpty(userId))
+                return UserError.Unauthorized;
+
+            var mealPlan = await _mealPlanRepository.GetByIdAsync(id, userId);
+            if (mealPlan == null)
+                return MealPlanError.MealPlanNotFound;
+
+            var existing = await _mealPlanRepository.GetByNameAsync(newName.Trim(), userId);
+            if (existing != null && existing.Id != id)
+                return MealPlanError.DuplicateName;
+
+            mealPlan.Name = newName;
+
+            await _mealPlanRepository.UpdateAsync(mealPlan);
+
+            return Unit.Default;
+        }
+    }        
 }
