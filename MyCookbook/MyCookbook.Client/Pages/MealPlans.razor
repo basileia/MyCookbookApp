@@ -5,12 +5,20 @@
 @rendermode InteractiveWebAssembly
 @inject NavigationManager NavigationManager
 @inject HttpClient Http
+@inject IJSRuntime JS
 
 <PageTitle>Jídelníčky - My Cookbook</PageTitle>
 
 <div class="page-header">
     <h2>Moje jídelníčky</h2>
 </div>
+
+@if (!string.IsNullOrWhiteSpace(errorMessage))
+{
+    <div class="alert alert-danger">
+        @errorMessage
+    </div>
+}
 
 <div class="recipe-form-container">
     <button class="action-button primary" type="button" @onclick="GoToNewMealPlan">Nový jídelníček</button>
@@ -37,10 +45,28 @@
                     <div class="mealplan-card-header">
                         <h3>@plan.Name</h3>
 
-                        <button class="icon-button mealplan-menu"
-                                @onclick:stopPropagation="true">
-                            <i class="bi bi-three-dots-vertical"></i>
-                        </button>
+                        <div>
+                            <button class="icon-button"
+                                    title="Přejmenovat"
+                                    @onclick:stopPropagation="true">
+                                <i class="fa-solid fa-pen icon"></i>
+                            </button>
+
+                            <button class="icon-button"
+                                    title="Duplikovat"
+                                    @onclick:stopPropagation="true"
+                                    @onclick="() => DuplicateMealPlan(plan.Id)">
+                                <i class="fa-solid fa-copy icon"></i>
+                            </button>
+
+                            <button class="icon-button danger"
+                                    title="Smazat"
+                                    @onclick:stopPropagation="true"
+                                    @onclick="() => ConfirmDelete(plan.Id)">
+                                <i class="fa-solid fa-trash icon"></i>
+                            </button>
+                        </div>
+
                     </div>
 
                     <div class="mealplan-card-meta">
@@ -66,6 +92,7 @@
 
 @code {
     private List<MealPlanListDto> mealPlans = new();
+    private string errorMessage = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
@@ -94,5 +121,79 @@
     private void OpenDetail(int id)
     {
         NavigationManager.NavigateTo($"/mealplans/{id}");
+    }    
+
+    private async Task ConfirmDelete(int id)
+    {
+        var confirmed = await JS.InvokeAsync<bool>(
+            "confirm",
+            "Opravdu chceš tento jídelníček smazat?"
+        );
+
+        if (!confirmed)
+            return;
+
+        await DeleteMealPlan(id);
+    }
+
+    private async Task DeleteMealPlan(int id)
+    {
+        errorMessage = string.Empty;
+
+        try 
+        {
+            var response = await Http.DeleteAsync($"api/mealplans/{id}");
+
+            if (response.IsSuccessStatusCode)
+            {
+                var plan = mealPlans.FirstOrDefault(p => p.Id == id);
+
+                if (plan != null)
+                    mealPlans.Remove(plan);                
+            }
+            else
+            {
+                var serverMessage = await response.Content.ReadAsStringAsync();
+
+                errorMessage = string.IsNullOrWhiteSpace(serverMessage)
+                    ? "Nepodařilo se smazat jídelníček."
+                    : serverMessage;
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+        StateHasChanged();
+    }
+
+    private async Task DuplicateMealPlan(int id)
+    {
+        errorMessage = string.Empty;
+
+        try
+        {
+            var response = await Http.PostAsync($"api/mealplans/{id}/duplicate", null);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var newPlan = await response.Content.ReadFromJsonAsync<MealPlanListDto>();
+
+                if (newPlan != null)
+                    mealPlans.Add(newPlan);
+            }
+            else
+            {
+                var message = await response.Content.ReadAsStringAsync();
+                errorMessage = string.IsNullOrWhiteSpace(message)
+                    ? "Nepodařilo se duplikovat jídelníček."
+                    : message;
+            }
+        } 
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+        StateHasChanged();
     }
 }

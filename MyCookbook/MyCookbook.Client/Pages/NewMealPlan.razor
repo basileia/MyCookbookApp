@@ -16,6 +16,12 @@
 
 <div class="recipe-form-container">
     <EditForm Model="MealPlanModel" OnValidSubmit="GenerateMealPlan">
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div class="alert alert-danger">
+                @errorMessage
+            </div>
+        }
         <DataAnnotationsValidator />
         <ValidationSummary/>
 
@@ -66,14 +72,18 @@
 
 @code {
     private NewMealPlanDto MealPlanModel { get; set; } = new();
+    private string errorMessage = string.Empty;
 
     private void ResetForm()
     {
         MealPlanModel = new();
+        errorMessage = string.Empty;
     }
 
     private async Task GenerateMealPlan()
     {
+        errorMessage = string.Empty; 
+
         try
         {
             var response = await Http.PostAsJsonAsync("/api/mealplans", MealPlanModel);
@@ -89,13 +99,13 @@
             }
             else
             {
-                var errorText = await response.Content.ReadAsStringAsync();
-                await JS.InvokeVoidAsync("alert", $"Chyba při vytváření jídelníčku: {errorText}");
+                var errorResult = await response.Content.ReadFromJsonAsync<Error>();
+                errorMessage = errorResult.Details;
             }
         }
         catch (Exception ex)
         {
-            await JS.InvokeVoidAsync("alert", $"Chyba při volání serveru: {ex.Message}");
+            errorMessage = ex.Message;
         }
     }
 

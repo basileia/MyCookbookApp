@@ -1,9 +1,12 @@
 ﻿using AutoMapper;
+using LanguageExt;
+using MyCookbook.Client.Pages;
 using MyCookbook.Data.Contracts.Repositories;
 using MyCookbook.Data.Contracts.Services;
 using MyCookbook.Data.Models;
 using MyCookbook.Results;
 using MyCookbook.Results.Errors;
+using MyCookbook.Services.Helpers;
 using MyCookbook.Shared.DTOs;
 using MyCookbook.Shared.DTOs.MealPlanDTOs;
 
@@ -29,15 +32,20 @@ namespace MyCookbook.Services
                 return UserError.Unauthorized;
             }
 
+            var existing = await _mealPlanRepository.GetByNameAsync(newMealPlanDto.Name.Trim(), userId);
+            if (existing != null)
+                return MealPlanError.DuplicateName;
+
             var filter = new FilterCriteriaDto
             {
                 Favorites = newMealPlanDto.FilterFavorites,
                 Tried = newMealPlanDto.FilterTried,
                 Mine = newMealPlanDto.FilterMine
             };
-            var filteredRecipes = await _recipeRepository.GetFilteredAsync(filter, userId);                      
+            var filteredRecipes = await _recipeRepository.GetFilteredAsync(filter, userId);
 
-            var mealPlan = new MealPlan { 
+            var mealPlan = new MealPlan
+            {
                 CreatedAt = DateTime.UtcNow,
                 Days = newMealPlanDto.Days,
                 Name = newMealPlanDto.Name,
@@ -61,7 +69,7 @@ namespace MyCookbook.Services
             }
 
             var categories = new[] { 1, 2, 3, 4 };
-            var usedRecipeIds = new HashSet<int>();
+            var usedRecipeIds = new System.Collections.Generic.HashSet<int>();
 
             foreach (var day in mealPlan.DaysPlan)
             {
@@ -87,7 +95,7 @@ namespace MyCookbook.Services
                 }
             }
 
-             await _mealPlanRepository.AddWithDaysAndRecipesAsync(mealPlan);
+            await _mealPlanRepository.AddWithDaysAndRecipesAsync(mealPlan);
 
             var mealPlanDetailDto = _mapper.Map<MealPlanDetailDto>(mealPlan);
             return mealPlanDetailDto;
@@ -125,8 +133,81 @@ namespace MyCookbook.Services
             var mealPlanListDtos = _mapper.Map<List<MealPlanListDto>>(mealPlans);
             return mealPlanListDtos;
         }
-    } 
 
-        /* Editace poznámek, nahrazení receptů
-            Zajištění, že jídelníčky patří jen danému uživateli*/
+        public async Task<Result<Unit, Error>> DeleteMealPlanAsync(string userId, int mealPlanId)
+        {
+            var mealPlan = await _mealPlanRepository
+                .GetByIdAsync(mealPlanId, userId);
+
+            if (mealPlan == null)
+            {
+                return MealPlanError.MealPlanNotFound;
+            }
+
+            await _mealPlanRepository.DeleteAsync(mealPlan);
+
+            return Unit.Default;
+        }
+
+        public async Task<Result<MealPlanDetailDto, Error>> DuplicateMealPlanAsync(string userId, int mealPlanId)
+        {
+            if (string.IsNullOrEmpty(userId))
+                return UserError.Unauthorized;
+
+            var original = await _mealPlanRepository.GetWithDaysAndRecipesAsync(mealPlanId, userId);
+
+            if (original == null)
+                return MealPlanError.MealPlanNotFound;
+
+            var allUserPlans = await _mealPlanRepository.GetAllByUserIdAsync(userId);
+            var existingNames = allUserPlans.Select(p => p.Name).ToList();
+
+            var newName = MealPlanNamingHelper.GetNextCopyName(original.Name, existingNames);
+
+            var copy = new MealPlan
+            {
+                Name = newName,
+                StartDayOfWeek = original.StartDayOfWeek,
+                Days = original.Days,
+                UserId = userId,
+                CreatedAt = DateTime.UtcNow,
+                DaysPlan = original.DaysPlan.Select(d => new MealPlanDay
+                {
+                    DayNumber = d.DayNumber,
+                    DayOfWeek = d.DayOfWeek,
+                    Recipes = d.Recipes.Select(r => new MealPlanRecipe
+                    {
+                        CategoryId = r.CategoryId,
+                        RecipeId = r.RecipeId
+                    }).ToList()
+                }).ToList()
+            };
+
+            await _mealPlanRepository.AddWithDaysAndRecipesAsync(copy);
+
+            var copyDto = _mapper.Map<MealPlanDetailDto>(copy);
+
+            return copyDto;
+        }
+
+        public async Task<Result<Unit, Error>> RenameMealPlanAsync(int id, string newName, string userId)
+        {
+            if (string.IsNullOrEmpty(userId))
+                return UserError.Unauthorized;
+
+            var mealPlan = await _mealPlanRepository.GetByIdAsync(id, userId);
+            if (mealPlan == null)
+                return MealPlanError.MealPlanNotFound;
+
+            var existing = await _mealPlanRepository.GetByNameAsync(newName.Trim(), userId);
+            if (existing != null && existing.Id != id)
+                return MealPlanError.DuplicateName;
+
+            mealPlan.Name = newName;
+
+            await _mealPlanRepository.UpdateAsync(mealPlan);
+
+            return Unit.Default;
+        }
+    }        
 }
