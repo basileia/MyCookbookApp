@@ -31,6 +31,7 @@ namespace MyCookbook.Data.Repositories
         {
             return await _context.MealPlans
                 .Where(mp => mp.UserId == userId)
+                .OrderByDescending(mp => mp.CreatedAt)
                 .ToListAsync();
         }
 
