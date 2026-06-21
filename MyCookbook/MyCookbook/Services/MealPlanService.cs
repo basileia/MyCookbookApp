@@ -192,18 +192,23 @@ namespace MyCookbook.Services
 
         public async Task<Result<Unit, Error>> RenameMealPlanAsync(int id, string newName, string userId)
         {
+            var trimmedName = newName?.Trim();
+
             if (string.IsNullOrEmpty(userId))
                 return UserError.Unauthorized;
+
+            if (string.IsNullOrWhiteSpace(trimmedName))
+                return MealPlanError.InvalidName;
 
             var mealPlan = await _mealPlanRepository.GetByIdAsync(id, userId);
             if (mealPlan == null)
                 return MealPlanError.MealPlanNotFound;
 
-            var existing = await _mealPlanRepository.GetByNameAsync(newName.Trim(), userId);
+            var existing = await _mealPlanRepository.GetByNameAsync(trimmedName, userId);
             if (existing != null && existing.Id != id)
                 return MealPlanError.DuplicateName;
 
-            mealPlan.Name = newName;
+            mealPlan.Name = trimmedName;
 
             await _mealPlanRepository.UpdateAsync(mealPlan);
 

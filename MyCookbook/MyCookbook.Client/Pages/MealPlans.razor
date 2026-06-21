@@ -43,12 +43,26 @@
                      @onclick="() => OpenDetail(plan.Id)">
 
                     <div class="mealplan-card-header">
-                        <h3>@plan.Name</h3>
+                        @if (editingId == plan.Id)
+                        {
+                            <input class="mealplan-edit-input"
+                                   @bind="editingName"
+                                   @bind:event="oninput"
+                                   @onblur="() => SaveRename(plan.Id)"
+                                   @onkeydown="(e) => OnRenameKeyDown(e, plan.Id)"
+                                   autofocus
+                                   @onclick:stopPropagation="true" />
+                        }
+                        else
+                        {
+                            <h3>@plan.Name</h3>
+                        }
 
                         <div>
                             <button class="icon-button"
                                     title="Přejmenovat"
-                                    @onclick:stopPropagation="true">
+                                    @onclick:stopPropagation="true"
+                                    @onclick="() => StartRename(plan)">
                                 <i class="fa-solid fa-pen icon"></i>
                             </button>
 
@@ -93,6 +107,8 @@
 @code {
     private List<MealPlanListDto> mealPlans = new();
     private string errorMessage = string.Empty;
+    private int? editingId = null;
+    private string editingName = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
@@ -195,5 +211,65 @@
             errorMessage = ex.Message;
         }
         StateHasChanged();
+    }
+
+    private void StartRename(MealPlanListDto plan)
+    {
+        editingId = plan.Id;
+        editingName = plan.Name;
+    }
+
+    private async Task OnRenameKeyDown(KeyboardEventArgs e, int id)
+    {
+        if (e.Key == "Enter")
+        {
+            await SaveRename(id);
+        }
+        else if (e.Key == "Escape")
+        {
+            CancelRename();
+        }
+    }
+
+    private async Task SaveRename(int id)
+    {
+        if (string.IsNullOrWhiteSpace(editingName))
+        {
+            CancelRename();
+            return;
+        }
+
+        try
+        {
+            var response = await Http.PutAsJsonAsync(
+                $"api/mealplans/{id}/rename",
+                new { Name = editingName });
+
+            if (response.IsSuccessStatusCode)
+            {
+                var plan = mealPlans.FirstOrDefault(p => p.Id == id);
+                if (plan != null)
+                    plan.Name = editingName;
+            }
+            else
+            {
+                var errorContent = await response.Content.ReadFromJsonAsync<Error>();
+                errorMessage = errorContent?.Details;
+                await JS.InvokeVoidAsync("scrollToTop");
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Nepodařilo se přejmenovat recept: {ex.Message}";
+            await JS.InvokeVoidAsync("scrollToTop");
+        }
+
+        editingId = null;
+    }
+
+    private void CancelRename()
+    {
+        editingId = null;
+        editingName = string.Empty;
     }
 }
